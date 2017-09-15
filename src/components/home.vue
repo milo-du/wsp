@@ -25,20 +25,111 @@
             </ul>
         </div>
         <div class="slide-content">
-            <swiper :options="contentSwiperOption" ref="contentSwiper">
-                <swiper-slide class="tab1" style="height:409px">  
-                    <div class="chat-box">
-                        ddd
-                    </div>                  
+            <swiper :options="contentSwiperOption" ref="contentSwiper" v-bind:class="{ notransform: tabData.index==0 }">
+                <swiper-slide class="tab1" style="height:409px">
+                    <div class="chat-box" @click.prevent="handleClickChatBox()">
+                        <ul class="chat-msg-list">
+                            <li class="d-flex">
+                                <div class="marry-chat-content clearfix d-flex">
+                                    <img src="/static/img/defaultuser.jpg" class="userphoto">                
+                                    <div class="flex">
+                                        <span class="nickname">广东深圳访客</span>
+                                        <div class="msg-content">
+                                            如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="d-flex">
+                                <div class="marry-chat-content clearfix d-flex">
+                                    <img src="/static/img/defaultuser.jpg" class="userphoto">                
+                                    <div class="flex">
+                                        <span class="nickname">广东深圳访客</span>
+                                        <div class="msg-content">
+                                            <img src="http://phpers.qiniudn.com/JGS2222222.jpg" class="chat-msg-img"></div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="d-flex">
+                                <div class="marry-chat-content clearfix d-flex">
+                                    <img src="/static/img/defaultuser.jpg" class="userphoto">                
+                                    <div class="flex">
+                                        <span class="nickname">广东深圳访客</span>
+                                        <div class="content-redpacket">
+                                            <ul class="bz d-flex rpna-ul hongbao">
+                                                <li class="rpna-pic">
+                                                    <img src="/static/img/hongbao_ico.png"></li>
+                                                <li class="flex">
+                                                    <p class="rena-wish">恭喜发财,大吉大利！</p>
+                                                    <p class="rena-get">
+                                                        <span>领取红包</span>
+                                                    </p>
+                                                </li>
+                                            </ul>
+                                            <div class="white-top">直播间红包</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="news-alert-time">
+                                <span>09-13 17:26</span>
+                            </li>
+                        </ul>
+                    </div>
                     <div class="fix-input-bar">
                         <ul class="op-box">
-                            <li class="inputicon qqface"></li>
+                            <li class="inputicon qqface" @click.prevent="handleShowQQFaceBox()"></li>
                             <li class="li-input thinborder">
-                             <input class="speakInput flex" type="text" placeholder="来说点什么吧...">
-                            </li>
-                           <li class="inputicon iconmore"></li>
-                           <li class="btnLiveTalk">发送</li>                        
+                                <input class="speakInput flex" type="text" v-model="cmtInput" @keydown="handleChooseIcon('[删除]',$event)" placeholder="来说点什么吧..."></li>
+                            <li class="inputicon iconmore" @click.prevent="handleShowMoreBox()" v-if="!showSendBtn"></li>
+                            <li class="btnLiveTalk" @click.prevent="sendCmt()" v-if="showSendBtn">发送</li>
                         </ul>
+                        <div class="qq-face-box" v-if="showQQFaceBox">
+                            <swiper :options="qqFaceSwiperOption" class="qq-face-swiper">
+                                <swiper-slide v-for="(qqFaceSlide,index) in qqIconData" class="swiper-qq-face-slide">
+                                    <template v-for="(qqIcon,childIndex) in qqFaceSlide">
+                                        <span> <i class="qqface-img" v-if="qqIcon=='[删除]'" v-bind:data-code="qqIcon" style="background-position: left -4620px;" @click.prevent="handleChooseIcon(qqIcon)"></i> <i class="qqface-img" v-else v-bind:data-code="qqIcon" :style="{ backgroundPosition:'left '+(-(660*index+childIndex*33))+'px' }" @click.prevent="handleChooseIcon(qqIcon)"></i>
+                                        </span>
+                                    </template>
+                                </swiper-slide>
+                                <div class="swiper-pagination qqFace-swiper-pagination" slot="pagination"></div>
+                            </swiper>
+                        </div>
+                        <div class="morebutton" v-if="showMoreBox">
+                            <ul class="morebutton-wrap">
+                                <li>
+                                    <a href="javascript:void(0)" class="inputicon redpacket" @click.prevent="handleShowRedBagBox"></a>
+                                    <p>红包</p>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0)" class="inputicon photo"></a>
+                                    <p>图片</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="toolmenu">
+                        <div class="rel side-icon">
+                            <!--优惠券-->                
+                            <div class="animation-shake youhuiquan"></div>
+                            <!--打赏对象-->                
+                            <a class="icon-live-yaoqing" href="/live/ShowExclusiveInvitaCard?topicId=281894"></a>
+
+                            <a class="shangzhubo onlybtn icon-live-shang"></a>
+                            <div class="zan-box icon-live-zan">
+                                <a class="zan-click" href="javascript:void(0);" @click.prevent="handleLike"><em class="zan"><i class="iconfont"></i></em> 
+                                </a>
+                                <span class="number zan-num" id="userpraise">430</span>
+                                <div class="j-likes-animation-wrap">
+                                    <div class="likes-animate j-likes-animate-box">
+                                        <div class="heart" v-bind:style="heartStyle">
+                                            <div class="heart-inner" style="background-image:url(/static/img/flyicon/9.png)"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </swiper-slide>
                 <swiper-slide class="tab2">
@@ -140,15 +231,44 @@
                     </h3>
                 </div>
                 <div class="popup-body">
-                    <img src="https://gss0.bdstatic.com/94o3dSag_xI4khGkpoWK1HF6hhy/baike/w%3D268%3Bg%3D0/sign=7bcb659c9745d688a302b5a29cf91a23/2934349b033b5bb571dc8c5133d3d539b600bc12.jpg">    
+                    <img src="https://gss0.bdstatic.com/94o3dSag_xI4khGkpoWK1HF6hhy/baike/w%3D268%3Bg%3D0/sign=7bcb659c9745d688a302b5a29cf91a23/2934349b033b5bb571dc8c5133d3d539b600bc12.jpg">        
                     <p>关注后可收到直播最新动态哦</p>
                 </div>
             </div>
         </div>
-    </div>  
+        <div class="sendredbagwin" v-if="showRedBagBox">
+            <div class="redbagmask" @tap.prevent="handleCloseRedBagBox"></div>
+            <div class="sendredbagwinmain layui-m-anim-scale">
+                <div id="msg-tipbar"></div>
+                <ul>
+                    <li class="d-flex line vcenter">
+                        <span>红包个数</span>
+                        <input type="number" placeholder="填写红包个数,最多500个" max="500" class="flex inputbox" id="bagAmount" min="0">        
+                        <span>个</span>
+                    </li>
+                    <li class="d-flex line vcenter">
+                        <span class="totalmoney">
+                            总金额 <i><img src="/static/img/redpacketping.png"></i>
+                        </span>
+                        <input type="number" placeholder="填写金额" class="flex inputbox" id="bagMoney" min="0">        
+                        <span>元</span>
+                    </li>
+                    <li class="d-flex line vcenter" style="display:none;height:3.4rem;">
+                        <span class="flex">发送时间</span>
+                        <input class="weui-input" style="text-align:right; width:15rem;" type="datetime-local" id="redbagpresendtime" value="2017-09-14T17:20" min="2017-09-14T17:14"></li>
+
+                    <li class="d-flex">
+                        <a href="javascript:void(0);" class="btn-cancel flex">取消</a>
+                        <div style="width:20px;"></div>
+                        <input type="button" disabled="disabled" class="livebtn red flex" id="btnSendRedBag" value="塞钱进红包"></li>
+                </ul>
+            </div>
+        </div>      
+    </div>
 </template>
 <script>
 import { swiper, swiperSlide } from 'vue-awesome-swiper';
+import qqfaceJson from "../qqfaceJson.js";
 export default {
     name: 'home',
     components: {
@@ -157,6 +277,17 @@ export default {
     },
     data() {
         return {
+            heartStyle:{
+                opacity: "1",
+                transform: "translate3d(0px, 0px, 0px)"
+            },
+            testHtml:"[微笑]aaaa[撇嘴]bbb",
+            showQQFaceBox:false,
+            showMoreBox:false,
+            showSendBtn:false,
+            showRedBagBox:false,            
+            cmtInput:'',
+            contentSwiperIndex:0,
             playing: false,
             poster: 'http://res.heyhou.com/image/2017/07/09/edfee97952303f86774131d1cecf73b1.jpg?imageView2/1/w/375/h/180',
             remoteUrl: 'http://res.heyhou.com/mp4/2017/08/30/783905f1fe7de28a542898ba7ebc79da.mp4',
@@ -169,19 +300,17 @@ export default {
                 observeParents: true
             },
             contentSwiperOption: {
-                setWrapperSize: true,
-                pagination: '.swiper-pagination',
+                setWrapperSize: true,                
                 paginationClickable: true,
                 mousewheelControl: true,
                 observeParents: true,
                 onSlideChangeEnd: function(swiper) {
                     var activeIndex = swiper.activeIndex;
-                    this.tabData.index = activeIndex;
+                    this.tabData.index = activeIndex;                
                 }.bind(this)
             },
             listSwiperOption: {
-                setWrapperSize: true,
-                pagination: '.swiper-pagination',
+                setWrapperSize: true,                
                 paginationClickable: true,
                 mousewheelControl: true,
                 observeParents: true,
@@ -189,7 +318,14 @@ export default {
                     var activeIndex = swiper.activeIndex;                    
                     this.isActive = activeIndex;
                 }.bind(this)
-            },            
+            },
+            qqFaceSwiperOption:{
+                setWrapperSize: true,                
+                paginationClickable: false,
+                pagination: '.swiper-pagination',
+                mousewheelControl: true,
+                observeParents: true                      
+            },     
             showPlayer: false,
             swiperSlides: ['http://res.heyhou.com/image/2017/07/09/edfee97952303f86774131d1cecf73b1.jpg?imageView2/1/w/375/h/180', 'http://res.heyhou.com/image/2017/07/28/18a4309efed43ce8451994f3f667a241.jpg?imageView2/1/w/375/h/180'],
             video: {
@@ -216,25 +352,103 @@ export default {
                 index:0
             },
             showFollowBox:false,
-            isActive:0           
+            isActive:0,
+            qqIconData:qqfaceJson.data                    
         }
     },
     created() {
-        document.title = '首页';        
+        document.title = '首页';
+    },
+    watch:{
+        'cmtInput': function(c, o) {
+            if (c.length != 0) {
+                this.showSendBtn = true;
+            } else {
+                this.showSendBtn = false;
+            }
+        }
     },
     methods: {
+        handleLike:function(){
+           var maxX = 10,
+               maxY = 0,
+               count = 100,      
+               _ran = (Math.random()+1).toFixed(2),  
+             timer = setInterval(()=>{              
+              maxY -= _ran;
+              count -- ;                      
+              maxX = _ran * maxX;
+              //maxY = _ran * maxY;
+              this.heartStyle = {
+                opacity: "1",
+                transform: "translate3d(0px, "+maxY+"px, 0px)"
+               };               
+              if(count == 0)
+              {
+                clearInterval(timer);
+              }
+           },50);
+        },
+        handleCloseRedBagBox:function(){
+            this.showRedBagBox = false;
+        },
+        handleShowRedBagBox:function(){
+            this.showRedBagBox = true;
+        },        
+        handleShowQQFaceBox:function(){
+            this.showMoreBox = false;
+            this.showQQFaceBox = this.showQQFaceBox ? false : true;
+        },
+        handleClickChatBox:function(){
+            this.showMoreBox = false;
+            this.showQQFaceBox = false;
+        },
+        handleShowMoreBox: function() {
+            this.showQQFaceBox = false;
+            this.showMoreBox = this.showMoreBox ? false : true;
+        },
+        sendCmt:function(){
+           
+        },
+        replaceContent: function(content) {
+            var imgList = qqfaceJson.imgList,
+                newContent = content;
+            for (var i = 0; i < imgList.length; i++) {
+                newContent = newContent.replace(imgList[i].key,"<img src='"+imgList[i].value+"' class='qq-face-gif' />");
+            }            
+            return newContent;
+        },
+        handleChooseIcon: function(iconCode, event) {
+            if (event) {
+                if (event.keyCode != 8) {
+                    return;
+                } else {
+                    event.preventDefault();
+                }
+            }
+            var cmtInput = this.cmtInput;
+            if (iconCode != '[删除]') {
+                cmtInput += iconCode;
+            } else {
+                var lastChar = cmtInput.substr(cmtInput.length - 1, 1);
+                if (lastChar == ']') {
+                    cmtInput = cmtInput.substr(0, cmtInput.lastIndexOf('['));
+                } else {
+                    cmtInput = cmtInput.substr(0, cmtInput.length - 1);
+                }
+            }
+            this.cmtInput = cmtInput;
+        },
         handleCloseFollowBox:function(){
-          this.showFollowBox = false;  
-        },
-        changePage(idx) {
-           console.log(idx);
-        },
-        handleClickNav:function(index){           
+          this.showFollowBox = false;
+        },   
+        handleClickNav:function(index){ 
            if(index < 4 ){             
              this.$refs.contentSwiper.swiper.slideTo(index);
+             this.tabData.index = index;
            }else{
               this.showFollowBox = true;
-           }
+           }                 
         },
         handleSwitchNav:function(index){
            this.isActive = index;
