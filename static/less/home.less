@@ -172,6 +172,38 @@ ul, li {
 
 					}
 
+					&.recive-redpacket {
+						font-size: 0.12rem;
+						text-align: center;
+
+						span {
+							color: #999;
+							display: inline-block;
+							border-radius: 3px;
+							padding: 0rem 0.1rem;
+							height: 0.2rem;
+							line-height: 0.2rem;
+							color: #ffffff;
+							background-color: rgba(0, 0, 0, 0.2);
+						}
+
+						em {
+							font-style: normal;
+							color: #f44c5d;
+							margin-left: 0.05rem;
+						}
+
+						.icon-redpacket {
+							width: 0.13rem;
+							height: 0.15rem;
+							margin-top: 0.025rem;
+							display: block;
+							float: left;
+							margin-right: 0.05rem;
+						}
+
+					}
+
 					.marry-chat-content {
 						img.userphoto {
 							display: inline-block;
@@ -504,6 +536,7 @@ ul, li {
 					width: 0.35rem;
 					height: 0.35rem;
 					display: block;
+					outline: none;
 				}
 
 				.number {
@@ -553,6 +586,19 @@ ul, li {
 					background: url(/static/img/ioc-2.0.png) -4.48rem -2.96rem no-repeat;
 					background-size: 5rem;
 					margin-top: 0.04rem;
+					transition: All 0.2s ease-in-out;
+					-webkit-transition: All 0.2s ease-in-out;
+					-moz-transition: All 0.2s ease-in-out;
+					-o-transition: All 0.2s ease-in-out;
+					outline: none;
+				}
+
+				.icon-zan-bigger {
+					transform: scale(1.2);
+					-webkit-transform: scale(1.2);
+					-moz-transform: scale(1.2);
+					-o-transform: scale(1.2);
+					-ms-transform: scale(1.2);
 				}
 
 				.j-likes-animation-wrap {
@@ -924,6 +970,109 @@ ul, li {
 		width: 100%;
 		left: 0;
 		top: 0;
+	}
+
+}
+
+.recive-redpacket-box {
+	.popup {
+		position: fixed;
+		background: url(/static/img/recive-redpacket-bg.png) no-repeat top center;
+		background-size: contain;
+		width: 3.375rem;
+		height: 5.0rem;
+		overflow-y: scroll;
+		border-radius: 3px;
+		background-color: #fff;
+		z-index: 13;
+		top: 50%;
+		left: 50%;
+		margin-left: -1.6875rem;
+		margin-top: -2.5rem;
+
+		.user-photo {
+			position: absolute;
+			width: 0.8rem;
+			height: 0.8rem;
+			border-radius: 50%;
+			top: 0.8rem;
+			left: 50%;
+			margin-left: -0.4rem;
+		}
+
+		.content-info {
+			margin-top: 1.65rem;
+
+			.nickname {
+				font-size: 0.145rem;
+				color: #404040;
+				text-align: center;
+
+				em {
+					font-style: normal;
+					background-color: #fdb930;
+					color: white;
+					padding: 0.02rem 0.01rem;
+					margin-left: 0.1rem;
+				}
+
+			}
+
+			.money {
+				text-align: center;
+				font-size: 0.145rem;
+				margin: 0.1rem 0;
+			}
+
+			.readpacket-title {
+				height: 0.4rem;
+				line-height: 0.4rem;
+				font-size: 0.14rem;
+				text-indent: 0.1rem;
+				background-color: #faf6f3;
+				color: #b7b3b0;
+				border-top: 1px solid #b9b9b9;
+				border-bottom: 1px solid #b9b9b9;
+			}
+
+			.user-list {
+				.user-item {
+					.user-item-photo {
+						display: block;
+
+						img {
+							width: 0.4rem;
+							height: 0.4rem;
+							border-radius: 50%;
+							display: block;
+						}
+
+					}
+
+					.user-info {
+						-webkit-box-flex: 1;
+						-moz-box-flex: 1;
+						-webkit-flex: 1;
+						-ms-flex: 1;
+						flex: 1;
+						display: table;
+
+						.nick-name {
+							display: table-row;
+						}
+
+						.time {
+							display: table-row;
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
 	}
 
 }

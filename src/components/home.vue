@@ -6,15 +6,15 @@
             <div class="swiper-pagination" slot="pagination"></div>
         </swiper>
         <div class="video-box">
-            <img src="http://res.heyhou.com/image/2017/07/09/edfee97952303f86774131d1cecf73b1.jpg?imageView2/1/w/375/h/180" class="video-cover">    
-            <a href="javascript:void(0)" class="btn-play">
+            <img :src="vedioInfo.img" class="video-cover" v-if="!showPlayer">   
+            <a href="javascript:void(0)" class="btn-play" v-if="!showPlayer" @click.prevent="handleShowPlayer">
                 <img src="/static/img/play.png"></a>
             <a href="javascript:void(0)" class="videoicon btn-refresh"></a>
             <span class="onlineuser">
                 <span class="videoicon seeuser"></span>
                 <span class="p-views">5.85万</span>
             </span>
-            <video ref="player" v-if="showPlayer" @click.prevent="play" v-on:playing="onPlaying" v-on:pause="onPause" v-on:waiting="onWaiting" v-on:timeupdate="onTimeupdate" :poster="poster" :src="remoteUrl" class="show-audio" loop="true" width="100%" preload="auto" type="video/mp4" playsinline="true" webkit-playsinline="true" x-webkit-airplay="true" x5-video-player-type="h5" x5-video-player-fullscreen="false"></video>
+            <video ref="player" v-if="showPlayer" @click.prevent="play" v-on:playing="onPlaying" v-on:pause="onPause" v-on:waiting="onWaiting" v-on:timeupdate="onTimeupdate" :poster="poster" :src="vedioInfo.vodUrl" class="show-audio" loop="true" width="100%" preload="auto" type="video/mp4" playsinline="true" webkit-playsinline="true" x-webkit-airplay="true" x5-video-player-type="h5" x5-video-player-fullscreen="false"></video>
         </div>
         <div class="tab-box">
             <ul class="nav">
@@ -26,35 +26,35 @@
         </div>
         <div class="slide-content">
             <swiper :options="contentSwiperOption" ref="contentSwiper" v-bind:class="{ notransform: tabData.index==0 }">
-                <swiper-slide class="tab1" style="height:409px">
+                <swiper-slide class="tab1" style="height:409px" v-scroll="onScroll">
                     <div class="chat-box" @click.prevent="handleClickChatBox()">
                         <ul class="chat-msg-list">
-                            <li class="d-flex">
+                           <template v-for="item in commentList">
+                            <li class="d-flex" v-if="item.type==2">
                                 <div class="marry-chat-content clearfix d-flex">
-                                    <img src="/static/img/defaultuser.jpg" class="userphoto">                
+                                    <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
                                     <div class="flex">
-                                        <span class="nickname">广东深圳访客</span>
+                                        <span class="nickname">{{item.userNickName}}</span>
                                         <div class="msg-content">
-                                            如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢如果内容有很长这里会怎样显示呢
+                                            <img :src="item.pic" class="chat-msg-img"></div>
+                                    </div>
+                                </div>
+                            </li>     
+                            <li class="d-flex" v-if="item.type==1">
+                                <div class="marry-chat-content clearfix d-flex">
+                                    <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
+                                    <div class="flex">
+                                        <span class="nickname">{{item.userNickName}}</span>
+                                        <div class="msg-content" v-html="replaceContent(item.content)">
                                         </div>
                                     </div>
                                 </div>
-                            </li>
-                            <li class="d-flex">
+                            </li>                 
+                            <li class="d-flex" v-if="item.type==3">
                                 <div class="marry-chat-content clearfix d-flex">
-                                    <img src="/static/img/defaultuser.jpg" class="userphoto">                
+                                    <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
                                     <div class="flex">
-                                        <span class="nickname">广东深圳访客</span>
-                                        <div class="msg-content">
-                                            <img src="http://phpers.qiniudn.com/JGS2222222.jpg" class="chat-msg-img"></div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="d-flex">
-                                <div class="marry-chat-content clearfix d-flex">
-                                    <img src="/static/img/defaultuser.jpg" class="userphoto">                
-                                    <div class="flex">
-                                        <span class="nickname">广东深圳访客</span>
+                                        <span class="nickname">{{item.userNickName}}</span>
                                         <div class="content-redpacket">
                                             <ul class="bz d-flex rpna-ul hongbao">
                                                 <li class="rpna-pic">
@@ -71,9 +71,14 @@
                                     </div>
                                 </div>
                             </li>
-                            <li class="news-alert-time">
+                            <li class="news-alert-time" v-if="item.type==10">
                                 <span>09-13 17:26</span>
                             </li>
+                            <li class="recive-redpacket">
+                                <span><img class="icon-redpacket" src="/static/img/hongbao_ico.png" />
+                                你领取了自己发的一个<em>4.9元红包</em></span>
+                            </li>                                                                               
+                           </template>
                         </ul>
                     </div>
                     <div class="fix-input-bar">
@@ -83,8 +88,7 @@
                                 <input class="speakInput flex" type="text" v-model="cmtInput" @keydown="handleChooseIcon('[删除]',$event)" placeholder="来说点什么吧..."></li>
                             <li class="inputicon iconmore" @click.prevent="handleShowMoreBox()" v-if="!showSendBtn"></li>
                             <li class="btnLiveTalk" @click.prevent="sendCmt()" v-if="showSendBtn">发送</li>
-                        </ul>
-                        <div class="qq-face-box" v-if="showQQFaceBox">
+                        </ul>                        <div class="qq-face-box" v-if="showQQFaceBox">
                             <swiper :options="qqFaceSwiperOption" class="qq-face-swiper">
                                 <swiper-slide v-for="(qqFaceSlide,index) in qqIconData" class="swiper-qq-face-slide">
                                     <template v-for="(qqIcon,childIndex) in qqFaceSlide">
@@ -114,21 +118,12 @@
                             <div class="animation-shake youhuiquan"></div>
                             <!--打赏对象-->                
                             <a class="icon-live-yaoqing" href="/live/ShowExclusiveInvitaCard?topicId=281894"></a>
-
                             <a class="shangzhubo onlybtn icon-live-shang"></a>
-                            <div class="zan-box icon-live-zan">
-                                <a class="zan-click" href="javascript:void(0);" @click.prevent="handleLike"><em class="zan"><i class="iconfont"></i></em> 
-                                </a>
-                                <span class="number zan-num" id="userpraise">430</span>
-                                <div class="j-likes-animation-wrap">
-                                    <div class="likes-animate j-likes-animate-box">
-                                        <div class="heart" v-bind:style="heartStyle">
-                                            <div class="heart-inner" style="background-image:url(/static/img/flyicon/9.png)"></div>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div v-bind:class="{'zan-box': true, 'icon-live-zan':true, 'icon-zan-bigger': liked}">
+                                <a class="zan-click" href="javascript:void(0);" @click.prevent="handleLike"><em class="zan"><i class="iconfont"></i></em>
+                                </a>                                
                             </div>
-
+                            <span class="number zan-num" id="userpraise">430</span>
                         </div>
                     </div>
                 </swiper-slide>
@@ -263,7 +258,32 @@
                         <input type="button" disabled="disabled" class="livebtn red flex" id="btnSendRedBag" value="塞钱进红包"></li>
                 </ul>
             </div>
-        </div>      
+        </div>
+        <div class="recive-redpacket-box">
+            <div class="pop-mask" @click.prevent="handleCloseReciveRedpacketBox"></div>
+            <div class="popup" @click.prevent="handleCloseReciveRedpacketBox">
+               <img src="/static/img/defaultuser.jpg" class="user-photo">
+               <div class="content-info">
+                  <p class="nickname">sunc的红包<em>拼</em></p>
+                  <p class="money">4.90元</p>
+                  <div class="readpacket-title">一个红包共4.9元</div>
+                  <ul class="user-list">
+                      <li class="flex user-item">
+                         <div class="user-item-photo">
+                           <img src="/static/img/defaultuser.jpg">
+                         </div>
+                         <div class="user-info">
+                             <span class="nick-name">suncz</span>
+                             <span class="time">2017-08-14 22:19:12</span>
+                         </div>
+                         <div class="money-box">
+                           <span class="money">4.90</span>
+                         </div>
+                      </li>
+                  </ul>
+               </div>               
+            </div>
+        </div>            
     </div>
 </template>
 <script>
@@ -281,6 +301,7 @@ export default {
                 opacity: "1",
                 transform: "translate3d(0px, 0px, 0px)"
             },
+            liked: false,
             testHtml:"[微笑]aaaa[撇嘴]bbb",
             showQQFaceBox:false,
             showMoreBox:false,
@@ -289,6 +310,7 @@ export default {
             cmtInput:'',
             contentSwiperIndex:0,
             playing: false,
+            vedioInfo:{},
             poster: 'http://res.heyhou.com/image/2017/07/09/edfee97952303f86774131d1cecf73b1.jpg?imageView2/1/w/375/h/180',
             remoteUrl: 'http://res.heyhou.com/mp4/2017/08/30/783905f1fe7de28a542898ba7ebc79da.mp4',
             swiperOption: {
@@ -353,11 +375,14 @@ export default {
             },
             showFollowBox:false,
             isActive:0,
-            qqIconData:qqfaceJson.data                    
+            qqIconData:qqfaceJson.data,
+            videoId:18,
+            commentList:[]
         }
     },
     created() {
         document.title = '首页';
+        this.loadData();
     },
     watch:{
         'cmtInput': function(c, o) {
@@ -369,25 +394,29 @@ export default {
         }
     },
     methods: {
+        replaceContent: function (content) {
+           if (!content) return '';
+           var imgList = qqfaceJson.imgList,
+             newContent = content;
+           for (var i = 0; i < imgList.length; i++) {
+            newContent = newContent.replace(imgList[i].key,"<img src='"+imgList[i].value+"' class='qq-face-gif' />");
+          }            
+          return newContent;
+        },
+        imageLoadError: function(e) {
+           e.target.src = '/static/img/defaultuser.jpg';
+        },
+        handleShowPlayer:function(){
+            this.showPlayer = true;
+        },
         handleLike:function(){
-           var maxX = 10,
-               maxY = 0,
-               count = 100,      
-               _ran = (Math.random()+1).toFixed(2),  
-             timer = setInterval(()=>{              
-              maxY -= _ran;
-              count -- ;                      
-              maxX = _ran * maxX;
-              //maxY = _ran * maxY;
-              this.heartStyle = {
-                opacity: "1",
-                transform: "translate3d(0px, "+maxY+"px, 0px)"
-               };               
-              if(count == 0)
-              {
-                clearInterval(timer);
-              }
-           },50);
+           this.liked=true; 
+           setTimeout(function(){
+               this.liked=false;
+           }.bind(this),200);
+        },
+        handleCloseReciveRedpacketBox:function(){
+
         },
         handleCloseRedBagBox:function(){
             this.showRedBagBox = false;
@@ -409,14 +438,6 @@ export default {
         },
         sendCmt:function(){
            
-        },
-        replaceContent: function(content) {
-            var imgList = qqfaceJson.imgList,
-                newContent = content;
-            for (var i = 0; i < imgList.length; i++) {
-                newContent = newContent.replace(imgList[i].key,"<img src='"+imgList[i].value+"' class='qq-face-gif' />");
-            }            
-            return newContent;
         },
         handleChooseIcon: function(iconCode, event) {
             if (event) {
@@ -492,28 +513,48 @@ export default {
                 this.maskShow = false;
             }
         },
-        loadList() {
-            this.$http.get('article/get_list', {
+        loadData(){
+            this.loadVideo();
+            this.loadComment();
+        },
+        loadVideo() {
+            this.$http.get('video/detail', {
                 params: {
-                    pageIndex: this.pageIndex,
-                    pageSize: this.pageSize
+                    videoId: this.videoId                  
                 }
             }).then(function(response) {
                 return response.json();
-            }).then(response => {
-                if (response.res == 0) {
-                    if (this.pageIndex == 1) {
-                        this.pages = Math.ceil(response.count / this.pageSize);
-                    }
-                    this.list = response.data;
+            }).then(response => {                
+                if (response.ret == 0) {                    
+                  this.vedioInfo = response.data.vedioInfo;
                 } else {
-                    this.$toast('加载失败，请稍候重试', {
-                        horizontalPosition: 'center'
-                    });
+                  
                 }
             }, response => {
 
             });
+        },
+        loadComment(){
+            this.$http.get('commentNew/commentList', {
+                params: {
+                    videoId: this.videoId,
+                    type:'new',
+                    commentId:0
+                }
+            }).then(function(response) {
+                return response.json();
+            }).then(response => {                
+                if (response.ret == 0) {
+                  this.commentList=response.data;
+                } else {
+                  
+                }
+            }, response => {
+
+            });                        
+        },
+        onScroll:function(e, position){
+          console.log(position);
         }
     }
 }
