@@ -1,20 +1,22 @@
 <template>
     <div class="container">
-        <swiper :options="swiperOption">
+        <swiper :options="swiperOption" v-if="false">
             <swiper-slide v-for="slide in swiperSlides" class="swiper-img-slide">
                 <img :src="slide"></swiper-slide>
             <div class="swiper-pagination" slot="pagination"></div>
         </swiper>
         <div class="video-box">
             <img :src="vedioInfo.img" class="video-cover" v-if="!showPlayer">   
-            <a href="javascript:void(0)" class="btn-play" v-if="!showPlayer" @click.prevent="handleShowPlayer">
+            <a href="javascript:void(0)" class=
+
+            "btn-play" v-if="!showPlayer" @click.prevent="handleShowPlayer">
                 <img src="/static/img/play.png"></a>
-            <a href="javascript:void(0)" class="videoicon btn-refresh"></a>
+            <a href="javascript:void(0)" class="videoicon btn-refresh" @click.prevent="reload()"></a>
             <span class="onlineuser">
                 <span class="videoicon seeuser"></span>
-                <span class="p-views">5.85万</span>
+                <span class="p-views">{{vedioInfo.pvNum || 0}}</span>
             </span>
-            <video ref="player" v-if="showPlayer" @click.prevent="play" v-on:playing="onPlaying" v-on:pause="onPause" v-on:waiting="onWaiting" v-on:timeupdate="onTimeupdate" :poster="poster" :src="vedioInfo.vodUrl" class="show-audio" loop="true" width="100%" preload="auto" type="video/mp4" playsinline="true" webkit-playsinline="true" x-webkit-airplay="true" x5-video-player-type="h5" x5-video-player-fullscreen="false"></video>
+            <video ref="player" v-if="showPlayer" @click.prevent="play" v-on:playing="onPlaying" v-on:pause="onPause" v-on:waiting="onWaiting" v-on:timeupdate="onTimeupdate" :poster="vedioInfo.img" :src="vedioInfo.vodUrl" class="show-audio" loop="true" width="100%" preload="auto" type="video/mp4" playsinline="true" webkit-playsinline="true" x-webkit-airplay="true" x5-video-player-type="h5" x5-video-player-fullscreen="false"></video>
         </div>
         <div class="tab-box">
             <ul class="nav">
@@ -26,7 +28,7 @@
         </div>
         <div class="slide-content">
             <swiper :options="contentSwiperOption" ref="contentSwiper" v-bind:class="{ notransform: tabData.index==0 }">
-                <swiper-slide class="tab1" style="height:409px" v-scroll="onScroll">
+                <swiper-slide class="tab1" ref="tab1" v-bind:style="{ height: scrollBoxHeight + 'px' }" v-scroll="onScroll">
                     <div class="chat-box" @click.prevent="handleClickChatBox()">
                         <ul class="chat-msg-list">
                            <template v-for="item in commentList">
@@ -55,7 +57,7 @@
                                     <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
                                     <div class="flex">
                                         <span class="nickname">{{item.userNickName}}</span>
-                                        <div class="content-redpacket">
+                                        <div class="content-redpacket" @click.prevent="handleOpenRedpack(item.redPacketId)">
                                             <ul class="bz d-flex rpna-ul hongbao">
                                                 <li class="rpna-pic">
                                                     <img src="/static/img/hongbao_ico.png"></li>
@@ -72,11 +74,11 @@
                                 </div>
                             </li>
                             <li class="news-alert-time" v-if="item.type==10">
-                                <span>09-13 17:26</span>
+                                <span>{{item.content}}</span>
                             </li>
-                            <li class="recive-redpacket">
+                            <li class="recive-redpacket" v-if="item.type==4">
                                 <span><img class="icon-redpacket" src="/static/img/hongbao_ico.png" />
-                                你领取了自己发的一个<em>4.9元红包</em></span>
+                                你领取了{{item.redPacketUserNickName}}发的一个<em>红包</em></span>
                             </li>                                                                               
                            </template>
                         </ul>
@@ -87,8 +89,9 @@
                             <li class="li-input thinborder">
                                 <input class="speakInput flex" type="text" v-model="cmtInput" @keydown="handleChooseIcon('[删除]',$event)" placeholder="来说点什么吧..."></li>
                             <li class="inputicon iconmore" @click.prevent="handleShowMoreBox()" v-if="!showSendBtn"></li>
-                            <li class="btnLiveTalk" @click.prevent="sendCmt()" v-if="showSendBtn">发送</li>
-                        </ul>                        <div class="qq-face-box" v-if="showQQFaceBox">
+                            <li class="btnLiveTalk" @click.prevent="sendCmt" v-if="showSendBtn">发送</li>
+                        </ul>
+                        <div class="qq-face-box" v-if="showQQFaceBox">
                             <swiper :options="qqFaceSwiperOption" class="qq-face-swiper">
                                 <swiper-slide v-for="(qqFaceSlide,index) in qqIconData" class="swiper-qq-face-slide">
                                     <template v-for="(qqIcon,childIndex) in qqFaceSlide">
@@ -105,8 +108,8 @@
                                     <a href="javascript:void(0)" class="inputicon redpacket" @click.prevent="handleShowRedBagBox"></a>
                                     <p>红包</p>
                                 </li>
-                                <li>
-                                    <a href="javascript:void(0)" class="inputicon photo"></a>
+                                <li id="pickfiles-container">
+                                    <a href="javascript:void(0)" class="inputicon photo" id="choose-img"></a>
                                     <p>图片</p>
                                 </li>
                             </ul>
@@ -118,16 +121,16 @@
                             <div class="animation-shake youhuiquan"></div>
                             <!--打赏对象-->                
                             <a class="icon-live-yaoqing" href="/live/ShowExclusiveInvitaCard?topicId=281894"></a>
-                            <a class="shangzhubo onlybtn icon-live-shang"></a>
+                            <a class="shangzhubo onlybtn icon-live-shang" @click.prevent="handleShowRewardRedpacket"></a>
                             <div v-bind:class="{'zan-box': true, 'icon-live-zan':true, 'icon-zan-bigger': liked}">
                                 <a class="zan-click" href="javascript:void(0);" @click.prevent="handleLike"><em class="zan"><i class="iconfont"></i></em>
                                 </a>                                
                             </div>
-                            <span class="number zan-num" id="userpraise">430</span>
+                            <span class="number zan-num" id="userpraise">{{vedioInfo.praiseNum || 0}}</span>
                         </div>
                     </div>
                 </swiper-slide>
-                <swiper-slide class="tab2">
+                <swiper-slide class="tab2" v-bind:style="{ height: scrollBoxHeight + 'px' }">
                     <h2>直播介绍</h2>
                     <div class="detail-intro">
                         <p>
@@ -155,7 +158,7 @@
                             <br>12 最终留在台上的3位，就是南昌站三强。</p>
                     </div>
                 </swiper-slide>
-                <swiper-slide class="tab3">
+                <swiper-slide class="tab3" v-bind:style="{ height: scrollBoxHeight + 'px' }">
                     <ul class="tab3-title">
                         <li>
                             <a href="javascript:void(0)" @click.prevent="handleSwitchNav(0)" v-bind:class="{ on: isActive==0 }">邀请榜</a>
@@ -167,39 +170,43 @@
                     <swiper :options="listSwiperOption" ref="listSwiper">
                         <swiper-slide class="list-tab1">
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" class="table-banglist">
-                                <tbody>
-                                    <tr>
+                                <tbody>                       
+                                    <tr v-for="(item,index) in inviteRankList">
                                         <td style="width:0.45rem;" class="banglist-num">
-                                            <img src="/static/img/list-1.png" class="banglist-tag"></td>
+                                            <img v-bind:src="'/static/img/list-' + (index+1)+'.png'" class="banglist-tag" v-if="index<3">
+                                            <span class="rolwnum" v-else>{{index+1}}</span>
+                                        </td>
                                         <td style="width:0.6rem;">
-                                            <img class="banglist-photo" src="http://wx.qlogo.cn/mmopen/7hINACNJlZjQmHibJCwAVwByFxpYMboynhNSUncRUvvBPxFsKBvCNwV28uMW5OG60daPTDy6jeYHgicibr5fWGNI7eibQHryy4s7/132"></td>
+                                            <img class="banglist-photo" :src="item.headImgUrl"></td>
                                         <td width="40%">
-                                            <span class="banglist-nickname">????诺</span>
+                                            <span class="banglist-nickname">{{item.nickname}}</span>
                                         </td>
                                         <td align="right">
                                             <span class="banglist-money">
-                                                邀请 <em>130</em>
+                                                邀请 <em>{{item.num}}</em>
                                                 人
                                             </span>
                                         </td>
-                                    </tr>        
+                                    </tr>                                          
                                 </tbody>
                             </table>
                         </swiper-slide>
                         <swiper-slide class="list-tab2">
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" class="table-banglist">
                                 <tbody>
-                                    <tr>
+                                    <tr v-for="(item,index) in rewardRankList">
                                         <td style="width:0.45rem;" class="banglist-num">
-                                            <img src="/static/img/list-1.png" class="banglist-tag"></td>
+                                            <img v-bind:src="'/static/img/list-' + (index+1)+'.png'" class="banglist-tag" v-if="index<3">
+                                            <span class="rolwnum" v-else>{{index+1}}</span>
+                                        </td>
                                         <td style="width:0.6rem;">
-                                            <img class="banglist-photo" src="http://wx.qlogo.cn/mmopen/7hINACNJlZjQmHibJCwAVwByFxpYMboynhNSUncRUvvBPxFsKBvCNwV28uMW5OG60daPTDy6jeYHgicibr5fWGNI7eibQHryy4s7/132"></td>
+                                            <img class="banglist-photo" :src="item.headImgUrl"></td>
                                         <td width="40%">
-                                            <span class="banglist-nickname">????诺</span>
+                                            <span class="banglist-nickname">{{item.nickname}}</span>
                                         </td>
                                         <td align="right">
                                             <span class="banglist-money">
-                                                <em>¥175.68</em>
+                                                <em>¥{{item.money}}</em>
                                             </span>
                                         </td>
                                     </tr>        
@@ -208,7 +215,7 @@
                         </swiper-slide>
                     </swiper>
                 </swiper-slide>
-                <swiper-slide class="tab4">
+                <swiper-slide class="tab4" v-bind:style="{ height: scrollBoxHeight + 'px' }">
                     <p>
                         &nbsp; &nbsp; &nbsp; <b>江西微彩传媒有限公司</b>
                         是一家专业提供各行业视频直播的传媒公司。公司的直播平台基于微信端平台，看直播无需下载APP，无需充值就可以直接用微信零钱收发红包，在直播间粉丝可以评论、打赏红包及礼物，同时还有投票、抽奖等等功能。其中一些特定行业还有专属模板，这个平台就类似一家小型电视台。2017年将是直播大年，直播将会是文化公司，传媒公司，婚庆公司等等必备的一大武器。加入我们，让你企业形象声名远扬。合作咨询电话：18779291518王
@@ -232,58 +239,123 @@
             </div>
         </div>
         <div class="sendredbagwin" v-if="showRedBagBox">
-            <div class="redbagmask" @tap.prevent="handleCloseRedBagBox"></div>
+            <div class="redbagmask" @click.prevent="handleHideSendRedPacketBox"></div>
             <div class="sendredbagwinmain layui-m-anim-scale">
-                <div id="msg-tipbar"></div>
+                <div id="msg-tipbar" v-if="showSendRedBagErr.length>0">{{showSendRedBagErr}}</div>
                 <ul>
                     <li class="d-flex line vcenter">
                         <span>红包个数</span>
-                        <input type="number" placeholder="填写红包个数,最多500个" max="500" class="flex inputbox" id="bagAmount" min="0">        
+                        <input type="tel" v-model="sendRedPacketData.num" placeholder="填写红包个数,最多500个" max="500" class="flex inputbox" id="bagAmount" min="0">        
                         <span>个</span>
                     </li>
+                    <li class="d-flex line vcenter">
+                        <span class="flex">红包类型：{{sendRedPacketData.type==1?'普通红包':'人气红包'}}</span>                        
+                        <a href="javascript:void(0)" class="change-redpack-type" @click.prevent="handleChangeRedpackType">切换</a>
+                    </li>                    
                     <li class="d-flex line vcenter">
                         <span class="totalmoney">
                             总金额 <i><img src="/static/img/redpacketping.png"></i>
                         </span>
-                        <input type="number" placeholder="填写金额" class="flex inputbox" id="bagMoney" min="0">        
+                        <input type="number" v-model="sendRedPacketData.money" placeholder="填写金额" class="flex inputbox" id="bagMoney" min="0">        
                         <span>元</span>
                     </li>
-                    <li class="d-flex line vcenter" style="display:none;height:3.4rem;">
-                        <span class="flex">发送时间</span>
-                        <input class="weui-input" style="text-align:right; width:15rem;" type="datetime-local" id="redbagpresendtime" value="2017-09-14T17:20" min="2017-09-14T17:14"></li>
-
                     <li class="d-flex">
-                        <a href="javascript:void(0);" class="btn-cancel flex">取消</a>
+                        <a href="javascript:void(0);" class="btn-cancel flex" @click.prevent="handleHideSendRedPacketBox">取消</a>
                         <div style="width:20px;"></div>
-                        <input type="button" disabled="disabled" class="livebtn red flex" id="btnSendRedBag" value="塞钱进红包"></li>
+                        <input type="button" :disabled="sendRedPacketBtn" class="livebtn red flex" id="btnSendRedBag" value="塞钱进红包" @click.prevent="handleSendRedPacket"></li>
                 </ul>
             </div>
         </div>
-        <div class="recive-redpacket-box">
-            <div class="pop-mask" @click.prevent="handleCloseReciveRedpacketBox"></div>
-            <div class="popup" @click.prevent="handleCloseReciveRedpacketBox">
-               <img src="/static/img/defaultuser.jpg" class="user-photo">
+        <div class="recive-redpacket-box" v-if="showReciveRedpacketList">
+            <div class="pop-mask" @click.prevent="handleHideReciveRedpacketList"></div>
+            <div class="popup">
+               <img :src="reciveRedpacketData.redPackInfo && reciveRedpacketData.redPackInfo.headImgUrl" @error="imageLoadError" class="user-photo">
+               <a href="javascript:void(0)" class="close-redpack-btn" @click.prevent="handleHideReciveRedpacketList"></a>
                <div class="content-info">
-                  <p class="nickname">sunc的红包<em>拼</em></p>
-                  <p class="money">4.90元</p>
-                  <div class="readpacket-title">一个红包共4.9元</div>
+                  <p class="nickname">{{reciveRedpacketData.redPackInfo && reciveRedpacketData.redPackInfo.nickName}}的红包<em v-if="reciveRedpacketData.redPackInfo && reciveRedpacketData.redPackInfo.type=='2'">拼</em></p>
+                  <p class="money">{{reciveRedpacketData.userReceiveMoney}}元</p>
+                  <div class="readpacket-title">{{reciveRedpacketData.displayWord}}</div>                  
                   <ul class="user-list">
-                      <li class="flex user-item">
+                      <li class="flex user-item" v-for="item in reciveRedpacketData.redPacketLogList">
                          <div class="user-item-photo">
-                           <img src="/static/img/defaultuser.jpg">
+                           <img :src="item.receiverUserheadImgUrl" @error="imageLoadError">
                          </div>
                          <div class="user-info">
-                             <span class="nick-name">suncz</span>
-                             <span class="time">2017-08-14 22:19:12</span>
+                             <span class="nick-name">{{item.receiverUserNickName}}</span>
+                             <span class="time">{{item.ReceiveTime}}</span>
                          </div>
                          <div class="money-box">
-                           <span class="money">4.90</span>
+                           <span class="redpack-money">{{item.receiveMoney/100}}元</span>
+                           <span class="best-tip" v-if="item.isBestLuck==1">
+                             <em>手气最佳</em>
+                             <img src="/static/img/best.png" class="best-img">
+                           </span>
                          </div>
                       </li>
                   </ul>
                </div>               
             </div>
-        </div>            
+        </div>      
+        <div class="reward-redpacket-box" v-if="showRewardRedpacketBox">
+            <div class="pop-mask" @click.prevent="handleHideRewardRedpacket"></div>
+            <div class="popup">
+               <img src="/static/img/defaultuser.jpg" class="user-photo">
+               <a href="javascript:void(0)" class="close-redpack-btn" @click.prevent="handleHideRewardRedpacket"></a>
+               <div class="content-info">
+                  <p class="nickname">小彩旗</p>
+                  <p class="p2">爱赞赏的人，运气不会太差~</p>          
+                  <ul class="flex money-select-list">
+                     <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(2)"><em>2</em>元</li>
+                     <li class="item-select-empty"></li>
+                     <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(5)"><em>5</em>元</li>
+                     <li class="item-select-empty"></li>
+                     <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(10)"><em>10</em>元</li>                     
+                  </ul>
+                  <ul class="flex money-select-list">
+                     <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(20)"><em>20</em>元</li>
+                     <li class="item-select-empty"></li>
+                     <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(50)"><em>50</em>元</li>
+                     <li class="item-select-empty"></li>
+                     <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(100)"><em>100</em>元</li>                     
+                  </ul>
+                  <a href="javascript:void(0)" class="other-money-btn" @click.prevent="handleShowRewardOtherMoneyBox">其他金额</a>
+               </div>               
+            </div>
+        </div>   
+        <div class="reward-other-money-box" v-if="showRewardOtherMoneyBox">
+            <div class="pop-mask" @click.prevent="handleHideRewardOtherMoneyBox"></div>
+            <div class="popup">
+               <p class="p-title">其他金额</p>
+               <div class="flex input-box">
+                  <span>金额(元)</span>
+                  <input type="tel" placeholder="可填写2-100" v-model="rewardMoney">
+               </div>          
+               <a href="javascript:void(0)" class="btn-sure" @click.prevent="handleSubmitRewardOtherMoney">确定</a>
+            </div>
+        </div>
+        <div class="open-redpack-box" v-if="showOpenRedPackBox">
+            <div class="pop-mask"></div>            
+            <div class="popup">
+               <a href="javascript:void(0)" class="close-redpack-btn" @click.prevent="handleCloseOpenRedpacketBox"></a>
+               <a href="javascript:void(0)" v-if="isSendEnd==0" class="open-redpack-btn" @click.prevent="handleOpenRedpacket">
+                 <img src="/static/img/open.png">
+               </a>
+               <img :src="redPackInfo.headImgUrl" @error="imageLoadError" class="user-photo">
+               <p class="p-title">suncz</p>
+               <template v-if="isSendEnd==0">
+                 <p class="p-title2">发了一个红包，金额随机</p>               
+                 <p class="p-title3">恭喜发财，大吉大利！</p>               
+               </template>
+               <template v-else>
+                 <p class="p-title3">手慢了，红包派完了</p>               
+               </template>
+               <a href="javascript:void(0)" class="btn-sure" @click.prevent="handleShowReciveRedpacketList()">看看大家的手气></a>
+            </div>
+        </div>                          
+        <div class="load-box" v-if="showLoading">
+            <div class="pop-mask"></div>            
+            <img src="/static/img/loading.gif" class="loadimg">
+        </div>        
     </div>
 </template>
 <script>
@@ -297,6 +369,9 @@ export default {
     },
     data() {
         return {
+            showOpenRedPackBox:false,
+            showLoading:false,
+            scrollBoxHeight:409,
             heartStyle:{
                 opacity: "1",
                 transform: "translate3d(0px, 0px, 0px)"
@@ -310,9 +385,7 @@ export default {
             cmtInput:'',
             contentSwiperIndex:0,
             playing: false,
-            vedioInfo:{},
-            poster: 'http://res.heyhou.com/image/2017/07/09/edfee97952303f86774131d1cecf73b1.jpg?imageView2/1/w/375/h/180',
-            remoteUrl: 'http://res.heyhou.com/mp4/2017/08/30/783905f1fe7de28a542898ba7ebc79da.mp4',
+            vedioInfo:{},                        
             swiperOption: {
                 autoplay: 3500,
                 setWrapperSize: true,
@@ -376,13 +449,30 @@ export default {
             showFollowBox:false,
             isActive:0,
             qqIconData:qqfaceJson.data,
-            videoId:18,
-            commentList:[]
+            videoId:this.getParam('videoId'),
+            commentList:[],
+            sendRedPacketData:{                
+                type:1,
+                num:'',
+                money:'',
+                codeWord:''
+            },
+            rewardRankList:[],
+            inviteRankList:[],
+            sendRedPacketBtn:true,
+            showSendRedBagErr:'',
+            isSendEnd:1,
+            redPackInfo:{},
+            showRewardRedpacketBox:false,
+            showRewardOtherMoneyBox:false,
+            rewardMoney:'',
+            showReciveRedpacketList:false,
+            reciveRedpacketData:{}
         }
     },
     created() {
         document.title = '首页';
-        this.loadData();
+        this.loadData();              
     },
     watch:{
         'cmtInput': function(c, o) {
@@ -391,9 +481,352 @@ export default {
             } else {
                 this.showSendBtn = false;
             }
+        },
+        'showMoreBox':function(c){
+            if (c) {
+                this.$nextTick(function() {
+                    this.initUploader("choose-img");
+                });
+            }
+        },
+        'sendRedPacketData.num':function(c){
+             if(c.length>0 && this.sendRedPacketData.money.length>0)
+             {
+                this.sendRedPacketBtn = false;
+             }
+             else{
+                this.sendRedPacketBtn = true;
+             }
+        },
+        'sendRedPacketData.money':function(c){
+             if(c.length>0 && this.sendRedPacketData.num.length>0)
+             {
+                this.sendRedPacketBtn = false;
+             }
+             else{
+                this.sendRedPacketBtn = true;
+             }
+        },
+        'rewardMoney':function(c){         
+            if(Number(c)>100 )
+            {
+                this.rewardMoney = 100;
+            }            
         }
     },
     methods: {
+        reload:function(){
+            window.location.reload();
+        },
+        handleShowReciveRedpacketList:function(redPacketId){
+            var redPacketId = redPacketId || this.redPackInfo.id;            
+            this.showOpenRedPackBox = false;
+            console.log(redPacketId);
+            this.request({                   
+                url: 'redPacket/redPacketDetail',
+                withToken: true,
+                data: {
+                    redPacketId:redPacketId
+                }
+            }).then(function(res) {
+                    res = res.data;
+                    if (res.ret == 0) {
+                       this.reciveRedpacketData = res.data;
+                    }
+                    else{
+                        alert(res.msg);
+                    }
+                }.bind(this),
+                function(err) {
+                    alert('服务器错误');
+                }.bind(this))             
+            this.showReciveRedpacketList = true;
+        },
+        handleHideReciveRedpacketList:function(){
+            this.showReciveRedpacketList = false;
+        },        
+        handleShowRewardOtherMoneyBox:function(){
+            this.showRewardOtherMoneyBox = true;
+        },
+        handleHideRewardOtherMoneyBox:function(){
+           this.showRewardOtherMoneyBox = false;
+        },        
+        handleShowRewardRedpacket:function(){
+            this.showRewardRedpacketBox = true;
+        },
+        handleHideRewardRedpacket:function(){
+            this.showRewardRedpacketBox = false;
+        },        
+        handleOpenRedpacket:function(){
+            this.request({   
+                type:'post',
+                url: 'redPacket/grabRedPacket',
+                withToken: true,
+                data: {
+                    redPacketId:this.redPackInfo.id
+                }
+            }).then(function(res) {
+                    res = res.data;
+                    if (res.ret == 0) {
+                        this.loadComment('new');
+                        this.handleShowReciveRedpacketList();
+                    }
+                    else{
+                        alert(res.msg);
+                    }
+                }.bind(this),
+                function(err) {
+                    alert('服务器错误');
+                }.bind(this))             
+        },
+        handleCloseOpenRedpacketBox:function(){
+            this.showOpenRedPackBox = false;
+        },
+        handleOpenRedpack:function(redPacketId){            
+            this.request({                
+                url: 'redPacket/redPacketReceivePage',
+                withToken: true,
+                data: {
+                    redPacketId: redPacketId
+                }
+            }).then(function(res) {
+                    res = res.data;
+                    if (res.ret == 0) {
+                       if(res.data.isExpired==1){
+                         alert('红包已超过24小时,不能查看！');
+                       }else{
+                           if(res.data.isReceived==1){
+                              this.handleShowReciveRedpacketList(redPacketId);
+                           }
+                           else{
+                             this.isSendEnd = res.data.isSendEnd;
+                             this.showOpenRedPackBox = true;     
+                             this.redPackInfo = res.data.redPackInfo;
+                           }
+                       }
+                    }
+                    else{
+                        alert(res.msg);
+                    }
+                }.bind(this),
+                function(err) {
+                    alert('服务器错误');
+                }.bind(this))            
+        },
+        handleHideSendRedPacketBox:function(){
+            this.showRedBagBox = false;
+        },
+        closeAllPop:function(){
+          this.showRedBagBox = false;  
+          this.showMoreBox = false;
+          this.showRewardRedpacketBox = false;
+          this.showRewardOtherMoneyBox = false;
+        },
+        handleSendRedPacket:function(){
+            this.sendRedPacketData.videoId=this.videoId;
+            this.sendRedPacketData.money = this.sendRedPacketData.money * 100;
+            this.request({
+                type: 'post',
+                url: 'redPacket/sendRedPacket',
+                withToken: true,
+                data: this.sendRedPacketData
+            }).then(function(res) {
+                    res = res.data;
+                    if (res.ret == 0) {
+                      var redpacketId = res.data.redpacketId;
+                      this.sendRedPacketData.money  = '';
+                      this.sendRedPacketData.num  = '';
+                      this.loadComment('new');
+                    }
+                    else{
+                        this.showSendRedBagErr(res.msg);
+                    }
+                }.bind(this),
+                function(err) {
+                    alert('服务器错误');
+                }.bind(this))                   
+        },
+        handleChangeRedpackType:function(){
+            this.sendRedPacketData.type = this.sendRedPacketData.type==1?2:1;
+        },
+        ajax: function(options) {
+            options = options || {};
+            var url = String(options.url).indexOf('http') === 0 ? options.url : CONFIG.DOMAIN.API + options.url;
+            options.url = url;
+            options.type = (options.type || "GET").toUpperCase();
+            options.dataType = options.dataType || "json";
+            var params = formatParams(options.data);
+
+            //创建 - 非IE6 - 第一步
+            if (window.XMLHttpRequest) {
+                var xhr = new XMLHttpRequest();
+            } else { //IE6及其以下版本浏览器
+                var xhr = new ActiveXObject('Microsoft.XMLHTTP');
+            }
+            //连接 和 发送 - 第二步
+            if (options.type == "GET") {
+                xhr.open("GET", options.url + "?" + params, options.async);
+                xhr.send(null);
+            } else if (options.type == "POST") {
+                xhr.open("POST", options.url, options.async);
+                //设置表单提交时的内容类型
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.send(params);
+            }
+
+            //接收 - 第三步
+            if (options.async === true) {
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState == 4) {
+                        callback();
+                    }
+                }
+            }
+            if (options.async === false) {
+                callback();
+            }
+
+            function callback() {
+                var status = xhr.status;
+                if (status >= 200 && status < 300) {
+                    options.success && options.success(xhr.responseText, xhr.responseXML);
+                } else {
+                    options.fail && options.fail(status);
+                }
+            }
+            //格式化参数
+            function formatParams(data) {
+                var arr = [];
+                for (var name in data) {
+                    arr.push(encodeURIComponent(name) + "=" + encodeURIComponent(data[name]));
+                }
+                arr.push(("v=" + Math.random()).replace(".", ""));
+                return arr.join("&");
+            }
+        },
+        getParam:function(n, t){
+           var i = new RegExp('(?:^|\\?|#|&)' + n + '=([^&#]*)(?:$|&|#)', 'i'),
+              o = i.exec(t || location.href);
+           return o ? decodeURIComponent(o[1]) : '';            
+        },
+        getUserInfo:function(){
+             var userInfo = {
+                uid:this.getParam('uid'),
+                token:this.getParam('token')
+             }
+             // var userInfo = window.localStorage.getItem('USER_INFO') || {uid:4,token:'6b66a23682144c04dd60d02ed87645db'};
+             return userInfo;
+        },
+        request: function(options) {
+            options.data = options.data || {};
+            var url = options.url;
+            if (!options.data.uid || !options.data.token) {
+                var userInfo = this.getUserInfo();
+                if (userInfo && userInfo.uid && userInfo.token) {
+                    options.data.userId = userInfo.uid;
+                    options.data.token = userInfo.token;
+                }
+            }
+
+            if (options.type == 'post') {
+                options.emulateJSON = true;
+                return this.$http.post(url, options.data, options);
+            } else {
+                return this.$http.get(url, {
+                    params: options.data
+                });
+            }
+        },
+        initUploader:function(elementID){
+            Qiniu.uploader({
+                runtimes: 'html5,flash,html4', // 上传模式，依次退化
+                browse_button: elementID, // 上传选择的点选按钮，必需
+                // 在初始化时，uptoken，uptoken_url，uptoken_func三个参数中必须有一个被设置
+                // 切如果提供了多个，其优先级为uptoken > uptoken_url > uptoken_func
+                // 其中uptoken是直接提供上传凭证，uptoken_url是提供了获取上传凭证的地址，如果需要定制获取uptoken的过程则可以设置uptoken_func
+                //uptoken: token, // uptoken是上传凭证，由其他程序生成
+                // uptoken_url: '/uptoken',      // Ajax请求uptoken的Url，强烈建议设置（服务端提供）
+                uptoken_func: function(file) { // 在需要获取uptoken时，该方法会被调用                                             
+                    var token = ''; 
+                    var userInfo = this.getUserInfo();
+                    this.ajax({
+                        type: 'get',
+                        url: 'tool/getQiniuToken',
+                        data: {                            
+                            userId:userInfo.uid,
+                            token: userInfo.token
+                        },
+                        async: false,
+                        success: function(res) {
+                            res = JSON.parse(res);
+                            token = res.data.token;                            
+                        },
+                        fail: function(err) {
+                            console.log(err);
+                        }
+                    });
+                    return token;
+                }.bind(this),
+                filters: {
+                    mime_types: [{
+                            title: "Image files",
+                            extensions: "jpg,gif,png"
+                        }, // 限定jpg,gif,png后缀上传
+                    ]
+                },                
+                get_new_uptoken: true, // 设置上传文件的时候是否每次都重新获取新的uptoken
+                // downtoken_url: '/downtoken',
+                // Ajax请求downToken的Url，私有空间时使用，JS-SDK将向该地址POST文件的key和domain，服务端返回的JSON必须包含url字段，url值为该文件的下载地址
+                //unique_names: false, // 默认false，key为文件名。若开启该选项，JS-SDK会为每个文件自动生成key（文件名）
+                save_key: true, // 默认false。若在服务端生成uptoken的上传策略中指定了sava_key，则开启，SDK在前端将不对key进行任何处理
+                domain: '<Your bucket domain>', // bucket域名，下载资源时用到，必需
+                container: 'pickfiles-container', // 上传区域DOM ID，默认是browser_button的父元素
+                max_file_size: '100mb', // 最大文件体积限制
+                //flash_swf_url: '/static/bower_components/plupload/js/Moxie.swf', //引入flash，相对路径
+                max_retries: 0, // 上传失败最大重试次数
+                dragdrop: false, // 开启可拖曳上传
+                drop_element: 'pickfiles-container', // 拖曳上传区域元素的ID，拖曳文件或文件夹后可触发上传
+                // chunk_size: '4mb',                 // 分块上传时，每块的体积
+                auto_start: true, // 选择文件后自动上传，若关闭需要自己绑定事件触发上传
+                multi_selection: false,
+                init: {
+                    'FilesAdded': function(up, files) {
+                        plupload.each(files, function(file) {
+                            // 文件添加进队列后，处理相关的事情
+                        });
+                    },
+                    'BeforeUpload': function(up, file) {
+                        var btn = up.getOption('browse_button')[0];
+                        btn.disabled = true;
+                    },
+                    'UploadProgress': function(up, file) {
+                        var btn = up.getOption('browse_button')[0];                        
+                    },
+                    'FileUploaded': function(up, file, info) {                        
+                        var result = JSON.parse(info.response);                        
+                        var imgUrl ='http://resource.mzlicai.cn/'+result.key;
+                        this.postCmt('',imgUrl);
+                    }.bind(this),
+                    'Error': function(up, err, errTip) {
+                        var result = JSON.parse(err.response);
+                        page.showError(result.error);
+                        var btn = up.getOption('browse_button')[0];
+                        btn.disabled = false;
+                        btn.innerHTML = '<img src="/static/images/add.png">';
+                    },
+                    'UploadComplete': function() {
+                        //队列文件处理完毕后，处理相关的事情
+                    },
+                    'Key': function(up, file) {
+                        // 若想在前端对每个文件的key进行个性化处理，可以配置该函数
+                        // 该配置必须要在unique_names: false，save_key: false时才生效                        
+                        var key = undefined;
+                        // do something with key here
+                        return key;
+                    }
+                }
+            });           
+        },
         replaceContent: function (content) {
            if (!content) return '';
            var imgList = qqfaceJson.imgList,
@@ -409,11 +842,30 @@ export default {
         handleShowPlayer:function(){
             this.showPlayer = true;
         },
-        handleLike:function(){
-           this.liked=true; 
-           setTimeout(function(){
-               this.liked=false;
-           }.bind(this),200);
+        handleLike: function() {
+            this.request({
+                type: 'post',
+                url: 'video/like',
+                withToken: true,
+                data: {
+                    videoId: this.videoId
+                }
+            }).then(function(res) {
+                    res = res.data;
+                    if (res.ret == 0) {
+                        this.vedioInfo.praiseNum = res.data.praiseNum;
+                        this.liked = true;
+                        setTimeout(function() {
+                            this.liked = false;
+                        }.bind(this), 200);
+                    }
+                    else{
+                        alert(res.msg);
+                    }
+                }.bind(this),
+                function(err) {
+                    alert('服务器错误');
+                }.bind(this))
         },
         handleCloseReciveRedpacketBox:function(){
 
@@ -436,8 +888,66 @@ export default {
             this.showQQFaceBox = false;
             this.showMoreBox = this.showMoreBox ? false : true;
         },
-        sendCmt:function(){
-           
+        postCmt:function(content,pic){
+            this.request({
+                type:'post',
+                url: 'commentNew/add',
+                withToken: true,
+                data: {
+                    videoId: this.videoId,
+                    content: content,
+                    pic:pic
+                }
+            }).then(function(res) {
+                    res = res.data;
+                    if (res.ret == 0) {
+                        this.cmtInput='';
+                        this.handleClickChatBox();
+                        this.loadComment('new');
+                    }
+                    else{
+                        alert(res.msg);
+                    }                    
+                }.bind(this),
+                function(err) {
+                    alert(err);
+                }.bind(this))             
+        },
+        handleSubmitRewardOtherMoney:function(money){
+            var money = money || this.rewardMoney;            
+            if(String(money).length>0)
+            {
+                this.postRedPacket(money);
+            }
+           else{
+               alert('请输入打赏金额');
+            }
+        },
+        postRedPacket:function(money){
+            this.request({
+                type:'post',
+                url: 'redPacket/sendRedPacketToPlatform',
+                withToken: true,
+                data: {
+                    videoId: this.videoId,
+                    money:parseFloat(money || this.rewardMoney) * 100
+                }
+            }).then(function(res) {
+                    res = res.data;
+                    if (res.ret == 0) {                        
+                        alert('打赏成功');
+                        this.closeAllPop();
+                    }
+                    else{
+                        alert(res.msg);
+                    }                    
+                }.bind(this),
+                function(err) {
+                    alert(err);
+                }.bind(this))             
+        },        
+        sendCmt:function(){            
+           this.postCmt(this.cmtInput,'');
         },
         handleChooseIcon: function(iconCode, event) {
             if (event) {
@@ -515,46 +1025,150 @@ export default {
         },
         loadData(){
             this.loadVideo();
-            this.loadComment();
+            this.loadComment('firstLoad');
+            this.loadRewardRank();
+            this.loadInviteRank();
+        },
+        loadRewardRank:function(){
+            this.request({
+                url: 'redPacket/getRewardRank',
+                withToken: true,
+                data: {
+                    videoId: this.videoId
+                }
+            }).then(function(res) {
+                    res = res.data;
+                    if (res.ret == 0) {
+                        this.rewardRankList = res.userRankList;                        
+                    }
+                    else{
+                        alert(res.msg);
+                    }                    
+                }.bind(this),
+                function(err) {
+                    alert('服务器错误');
+                }.bind(this))
+        },
+        loadInviteRank:function(){
+            this.request({
+                url: 'video/getInviteRank',
+                withToken: true,
+                data: {
+                     videoId: this.videoId                  
+                }
+            }).then(function(res) {
+                    res = res.data;
+                    if (res.ret == 0) {
+                        this.inviteRankList = res.userRankList;
+                    }
+                    else{
+                        alert(res.msg);
+                    }                    
+                },
+                function(err) {
+                    alert('服务器错误');
+                })
         },
         loadVideo() {
-            this.$http.get('video/detail', {
-                params: {
-                    videoId: this.videoId                  
+            this.request({
+                url: 'video/detail',
+                withToken: true,
+                data: {
+                    videoId: this.videoId
                 }
-            }).then(function(response) {
-                return response.json();
-            }).then(response => {                
-                if (response.ret == 0) {                    
-                  this.vedioInfo = response.data.vedioInfo;
-                } else {
-                  
-                }
-            }, response => {
-
-            });
+            }).then(function(res) {
+                    res = res.data;
+                    if (res.ret == 0) {
+                        this.vedioInfo = res.data.vedioInfo;
+                    }
+                    else{
+                        alert(res.msg);
+                    }                    
+                },
+                function(err) {
+                    alert('服务器错误');
+                })
         },
-        loadComment(){
-            this.$http.get('commentNew/commentList', {
-                params: {
-                    videoId: this.videoId,
-                    type:'new',
-                    commentId:0
-                }
-            }).then(function(response) {
-                return response.json();
-            }).then(response => {                
-                if (response.ret == 0) {
-                  this.commentList=response.data;
-                } else {
-                  
-                }
-            }, response => {
-
-            });                        
+        loadComment(type) {
+            if (this.startLoadData) {
+                return;
+            }
+            var formData = {
+                videoId: this.videoId
+            };
+            var timeReferenceArr = this.commentList.filter(function(item) {
+                return item.type == 10
+            });
+            var commentList = this.commentList.filter(function(item) {
+                return item.type != 10
+            });
+            switch (type) {
+                case 'firstLoad':
+                    {
+                        formData.type = 'new';
+                        formData.commentId = 0;
+                    }
+                    break;
+                case 'new':
+                    {
+                        formData.type = 'new';
+                        formData.commentId = commentList[commentList.length - 1].id;
+                        formData.timeReferencePointLine = timeReferenceArr[timeReferenceArr.length - 1].timeReferencePointLine;
+                    }
+                    break;
+                case 'old':
+                    {
+                        formData.type = 'old';
+                        formData.commentId = commentList[0].id;                        
+                        formData.timeReferencePointLine = timeReferenceArr[0].timeReferencePointLine;
+                    }
+                    break;
+            }
+            this.startLoadData = true;
+            this.request({
+                url: 'commentNew/commentList',
+                withToken: true,
+                data: formData
+            }).then(function(res) {
+                    this.startLoadData = false;
+                    res = res.data;
+                    res.data = res.data.reverse();
+                    if (res.ret == 0) {
+                        switch (type) {
+                            case 'firstLoad':
+                                {
+                                    this.commentList = res.data;
+                                }
+                                break;
+                            case 'new':
+                                {
+                                    this.commentList = this.commentList.concat(res.data);
+                                    this.$nextTick(function(){
+                                       this.$refs.tab1.$el.scrollTop = this.$refs.tab1.$el.scrollHeight;
+                                    });              
+                                    this.closeAllPop();                                  
+                                }
+                                break;
+                            case 'old':
+                                {
+                                    this.commentList = res.data.concat(this.commentList);
+                                }
+                                break;
+                        }
+                    }
+                    else{
+                        alert(res.msg);
+                    }
+                }.bind(this),
+                function(err) {
+                    alert('服务器错误');
+                    this.startLoadData = false;
+                }.bind(this))
         },
         onScroll:function(e, position){
-          console.log(position);
+            if(position.scrollTop==0){
+                this.loadComment('old');
+            }
         }
     }
 }

@@ -7,17 +7,24 @@ import vueResource from "vue-resource";
 import Toast from 'vue-easy-toast';
 import VueAwesomeSwiper from 'vue-awesome-swiper';
 import vuescroll from 'vue-scroll';
+import qiniuJS from 'qiniu-js';
+import plupload from 'plupload';
 import dateFormat from "dateformat";
 import utils from "./utils.js";
+import CONFIG from "./config.js";
 require('swiper/dist/css/swiper.css');
 
 utils.refreshRem();
+window.moxie = plupload.moxie;
+window.plupload = plupload;
+Vue.use(qiniuJS);
 Vue.use(vuescroll);
 Vue.use(vueResource);
 Vue.use(Toast);
 Vue.use(VueAwesomeSwiper);
 Vue.filter('dateFormat', dateFormat);
 Vue.config.productionTip = false;
+Vue.http.options.emulateJSON = true;
 Vue.http.options.root = '//wsp.mzlicai.cn';
 /* eslint-disable no-new */
 new Vue({
