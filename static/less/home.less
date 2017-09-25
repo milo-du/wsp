@@ -78,6 +78,303 @@ ul, li {
 
 }
 
+.toolmenu {
+	position: fixed;
+	right: 0.2rem;
+	bottom: 0.7rem;
+	z-index: 2;
+
+	.side-icon {
+		position: absolute;
+		text-align: center;
+		right: 0.05rem;
+		bottom: 0.2rem;
+
+		a {
+			width: 0.35rem;
+			height: 0.35rem;
+			display: block;
+			outline: none;
+		}
+
+		.number {
+			position: absolute;
+			min-width: 0.35rem;
+			font-size: 0.1rem;
+			display: block;
+			color: #fff;
+			line-height: 0.13rem;
+			text-align: center;
+			border-radius: 10px;
+			background: grey;
+			right: 0;
+			padding: 0.02rem 0.04rem;
+			white-space: nowrap;
+			margin-top: 0.04rem;
+		}
+
+		.youhuiquan {
+			width: 0.35rem;
+			height: 0.35rem;
+			display: none;
+			background: url(/static/img/ioc-2.0.png) -4.43rem 0 no-repeat;
+			background-size: 5rem;
+			position: relative;
+			margin-bottom: 0.04rem;
+		}
+
+		.icon-live-yaoqing {
+			background: url(/static/img/ioc-2.0.png) -4.48rem -2.24rem no-repeat;
+			background-size: 5rem;
+			margin-top: 0.04rem;
+		}
+
+		.icon-live-shang {
+			background: url(/static/img/ioc-2.0.png) -4.48rem -2.6rem no-repeat;
+			background-size: 5rem;
+			margin-top: 0.04rem;
+		}
+
+		.qianghongbao {
+			width: 0.35rem;
+			max-width: none;
+		}
+
+		.icon-live-zan {
+			background: url(/static/img/ioc-2.0.png) -4.48rem -2.96rem no-repeat;
+			background-size: 5rem;
+			margin-top: 0.04rem;
+			transition: All 0.2s ease-in-out;
+			-webkit-transition: All 0.2s ease-in-out;
+			-moz-transition: All 0.2s ease-in-out;
+			-o-transition: All 0.2s ease-in-out;
+			outline: none;
+		}
+
+		.icon-zan-bigger {
+			transform: scale(1.2);
+			-webkit-transform: scale(1.2);
+			-moz-transform: scale(1.2);
+			-o-transform: scale(1.2);
+			-ms-transform: scale(1.2);
+		}
+
+		.j-likes-animation-wrap {
+			.j-likes-animate-box {
+				position: absolute;
+				right: 35px;
+				width: 42px;
+				height: 42px;
+				bottom: 0px;
+				z-index: 5;
+
+				.heart, .heart-large {
+					position: absolute;
+					width: 30px;
+					opacity: 0;
+					-webkit-backface-visibility: hidden;
+					backface-visibility: hidden;
+					-webkit-perspective: 1000;
+					perspective: 1000;
+
+					.heart-inner {
+						width: 30px;
+						height: 25px;
+						-webkit-background-size: cover;
+						background-size: cover;
+						-webkit-transform-origin: 100% 50%;
+						transform-origin: 100% 50%;
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
+}
+
+.fix-input-bar {
+	position: fixed;
+	width: 100%;
+	background-color: #fff;
+	z-index: 5;
+	bottom: 0;
+	max-width: 640px;
+	transform: translateZ(0);
+	-webkit-transform: translateZ(0);
+
+	.op-box {
+		height: 0.5rem;
+		background-color: #fff;
+		display: -webkit-box;
+		display: -webkit-flex;
+		display: -ms-flexbox;
+		display: flex;
+		align-items: center;
+		-webkit-box-align: center;
+		-webkit-align-items: center;
+		-ms-flex-align: center;
+
+		.li-input {
+			margin-left: 0.05rem;
+			margin-right: 0.1rem;
+			height: 0.35rem;
+			position: relative;
+			margin: 0 0.1rem;
+			-webkit-box-flex: 1;
+			-webkit-flex: 1;
+			-ms-flex: 1;
+			flex: 1;
+			cursor: pointer;
+
+			.speakInput {
+				margin: 0;
+				height: 100%;
+				width: 100%;
+				padding: 0 0.05rem;
+				position: relative;
+				z-index: 2;
+				box-sizing: border-box;
+				-webkit-box-flex: 1;
+				-webkit-flex: 1;
+				-ms-flex: 1;
+				flex: 1;
+				cursor: pointer;
+				outline: 0;
+				-webkit-appearance: none;
+				outline: 0;
+				border: none;
+				border-radius: 0;
+				background: 0 0;
+			}
+
+		}
+
+		.thinborder {
+			&:after {
+				content: "";
+				position: absolute;
+				left: 0;
+				width: 200%;
+				height: 200%;
+				z-index: 1;
+				top: 0;
+				border: 1px solid #d6d6d6;
+				-webkit-transform: scale(.5);
+				transform: scale(.5);
+				-webkit-transform-origin: 0 0;
+				transform-origin: 0 0;
+				border-radius: 8px;
+			}
+
+		}
+
+		.btnLiveTalk {
+			cursor: pointer;
+			width: 0.4rem;
+			height: 0.3rem;
+			font-size: 0.14rem;
+			border-radius: 3px;
+			background: #00a2ff;
+			margin-right: 0.05rem;
+			line-height: 0.3rem;
+			color: #fff;
+			text-align: center;
+		}
+
+	}
+
+	.qq-face-box {
+		.qq-face-swiper {
+			padding-bottom: 0.2rem;
+
+			&:before {
+				content: " ";
+				position: absolute;
+				left: 0;
+				top: 0;
+				transform-origin: 0 0;
+				transform: scaleY(.5);
+				width: 100%;
+				height: 1px;
+				border-bottom: 1px solid #d6d6d6;
+			}
+
+		}
+
+		.qqFace-swiper-pagination {
+			bottom: 0;
+		}
+
+		.swiper-qq-face-slide {
+			span {
+				width: 14.28%;
+				margin: 8px 0;
+				text-align: center;
+				height: 33px;
+				display: inline-block;
+				float: left;
+			}
+
+		}
+
+		.qqface-img {
+			cursor: pointer;
+			background: url(/static/img/qqface2017.jpg) left top no-repeat;
+			background-size: 100%;
+			width: 33px;
+			display: block;
+			height: 33px;
+			margin-top: 0;
+			font-size: 0;
+			display: inline-block;
+		}
+
+	}
+
+	.morebutton {
+		position: relative;
+		background: #fff;
+
+		&:before {
+			content: " ";
+			position: absolute;
+			left: 0;
+			top: 0;
+			transform-origin: 0 0;
+			transform: scaleY(.5);
+			width: 100%;
+			height: 1px;
+			border-bottom: 1px solid #d6d6d6
+		}
+
+		.morebutton-wrap {
+			padding-top: 0.1rem;
+			padding-bottom: 0.1rem;
+
+			li {
+				width: 25%;
+				float: left;
+				margin: 0 0 14px;
+
+				p {
+					text-align: center;
+					color: #909090;
+					font-size: 0.12rem;
+					margin-top: 4px;
+				}
+
+			}
+
+		}
+
+	}
+
+}
+
 .tab-box {
 	width: 100%;
 
@@ -147,6 +444,10 @@ ul, li {
 		background-color: #ebebeb;
 		overflow-y: scroll;
 
+		&::-webkit-scrollbar {
+			display: none;
+		}
+
 		.chat-box {
 			padding-bottom: 0.8rem;
 			padding-top: 0.2rem;
@@ -154,6 +455,12 @@ ul, li {
 			.chat-msg-list {
 				font-size: 0.15rem;
 				padding: 0 0.1rem;
+
+				.loading-gif {
+					 width: 16px;
+					 height: 16px;
+					 margin: 0 auto;
+				}
 
 				li {
 					margin-bottom: 0.12rem;
@@ -333,303 +640,6 @@ ul, li {
 								color: #ccc;
 								border-bottom-left-radius: 0.04rem;
 								border-bottom-right-radius: 0.04rem;
-							}
-
-						}
-
-					}
-
-				}
-
-			}
-
-		}
-
-		.fix-input-bar {
-			position: fixed;
-			width: inherit;
-			background-color: #fff;
-			z-index: 5;
-			bottom: 0;
-			max-width: 640px;
-			transform: translateZ(0);
-			-webkit-transform: translateZ(0);
-
-			.op-box {
-				height: 0.5rem;
-				background-color: #fff;
-				display: -webkit-box;
-				display: -webkit-flex;
-				display: -ms-flexbox;
-				display: flex;
-				align-items: center;
-				-webkit-box-align: center;
-				-webkit-align-items: center;
-				-ms-flex-align: center;
-
-				.li-input {
-					margin-left: 0.05rem;
-					margin-right: 0.1rem;
-					height: 0.35rem;
-					position: relative;
-					margin: 0 0.1rem;
-					-webkit-box-flex: 1;
-					-webkit-flex: 1;
-					-ms-flex: 1;
-					flex: 1;
-					cursor: pointer;
-
-					.speakInput {
-						margin: 0;
-						height: 100%;
-						width: 100%;
-						padding: 0 0.05rem;
-						position: relative;
-						z-index: 2;
-						box-sizing: border-box;
-						-webkit-box-flex: 1;
-						-webkit-flex: 1;
-						-ms-flex: 1;
-						flex: 1;
-						cursor: pointer;
-						outline: 0;
-						-webkit-appearance: none;
-						outline: 0;
-						border: none;
-						border-radius: 0;
-						background: 0 0;
-					}
-
-				}
-
-				.thinborder {
-					&:after {
-						content: "";
-						position: absolute;
-						left: 0;
-						width: 200%;
-						height: 200%;
-						z-index: 1;
-						top: 0;
-						border: 1px solid #d6d6d6;
-						-webkit-transform: scale(.5);
-						transform: scale(.5);
-						-webkit-transform-origin: 0 0;
-						transform-origin: 0 0;
-						border-radius: 8px;
-					}
-
-				}
-
-				.btnLiveTalk {
-					cursor: pointer;
-					width: 0.4rem;
-					height: 0.3rem;
-					font-size: 0.14rem;
-					border-radius: 3px;
-					background: #00a2ff;
-					margin-right: 0.05rem;
-					line-height: 0.3rem;
-					color: #fff;
-					text-align: center;
-				}
-
-			}
-
-			.qq-face-box {
-				.qq-face-swiper {
-					padding-bottom: 0.2rem;
-
-					&:before {
-						content: " ";
-						position: absolute;
-						left: 0;
-						top: 0;
-						transform-origin: 0 0;
-						transform: scaleY(.5);
-						width: 100%;
-						height: 1px;
-						border-bottom: 1px solid #d6d6d6;
-					}
-
-				}
-
-				.qqFace-swiper-pagination {
-					bottom: 0;
-				}
-
-				.swiper-qq-face-slide {
-					span {
-						width: 14.28%;
-						margin: 8px 0;
-						text-align: center;
-						height: 33px;
-						display: inline-block;
-						float: left;
-					}
-
-				}
-
-				.qqface-img {
-					cursor: pointer;
-					background: url(/static/img/qqface2017.jpg) left top no-repeat;
-					background-size: 100%;
-					width: 33px;
-					display: block;
-					height: 33px;
-					margin-top: 0;
-					font-size: 0;
-					display: inline-block;
-				}
-
-			}
-
-			.morebutton {
-				position: relative;
-				background: #fff;
-
-				&:before {
-					content: " ";
-					position: absolute;
-					left: 0;
-					top: 0;
-					transform-origin: 0 0;
-					transform: scaleY(.5);
-					width: 100%;
-					height: 1px;
-					border-bottom: 1px solid #d6d6d6
-				}
-
-				.morebutton-wrap {
-					padding-top: 0.1rem;
-					padding-bottom: 0.1rem;
-
-					li {
-						width: 25%;
-						float: left;
-						margin: 0 0 14px;
-
-						p {
-							text-align: center;
-							color: #909090;
-							font-size: 0.12rem;
-							margin-top: 4px;
-						}
-
-					}
-
-				}
-
-			}
-
-		}
-
-		.toolmenu {
-			position: fixed;
-			right: 5px;
-			bottom: 0.7rem;
-			z-index: 2;
-
-			.side-icon {
-				position: absolute;
-				text-align: center;
-				right: 0.05rem;
-				bottom: 0.2rem;
-
-				a {
-					width: 0.35rem;
-					height: 0.35rem;
-					display: block;
-					outline: none;
-				}
-
-				.number {
-					position: absolute;
-					min-width: 0.35rem;
-					font-size: 0.1rem;
-					display: block;
-					color: #fff;
-					line-height: 0.13rem;
-					text-align: center;
-					border-radius: 10px;
-					background: grey;
-					right: 0;
-					padding: 0.02rem 0.04rem;
-					white-space: nowrap;
-					margin-top: 0.04rem;
-				}
-
-				.youhuiquan {
-					width: 0.35rem;
-					height: 0.35rem;
-					display: none;
-					background: url(/static/img/ioc-2.0.png) -4.43rem 0 no-repeat;
-					background-size: 5rem;
-					position: relative;
-					margin-bottom: 0.04rem;
-				}
-
-				.icon-live-yaoqing {
-					background: url(/static/img/ioc-2.0.png) -4.48rem -2.24rem no-repeat;
-					background-size: 5rem;
-					margin-top: 0.04rem;
-				}
-
-				.icon-live-shang {
-					background: url(/static/img/ioc-2.0.png) -4.48rem -2.6rem no-repeat;
-					background-size: 5rem;
-					margin-top: 0.04rem;
-				}
-
-				.qianghongbao {
-					width: 0.35rem;
-					max-width: none;
-				}
-
-				.icon-live-zan {
-					background: url(/static/img/ioc-2.0.png) -4.48rem -2.96rem no-repeat;
-					background-size: 5rem;
-					margin-top: 0.04rem;
-					transition: All 0.2s ease-in-out;
-					-webkit-transition: All 0.2s ease-in-out;
-					-moz-transition: All 0.2s ease-in-out;
-					-o-transition: All 0.2s ease-in-out;
-					outline: none;
-				}
-
-				.icon-zan-bigger {
-					transform: scale(1.2);
-					-webkit-transform: scale(1.2);
-					-moz-transform: scale(1.2);
-					-o-transform: scale(1.2);
-					-ms-transform: scale(1.2);
-				}
-
-				.j-likes-animation-wrap {
-					.j-likes-animate-box {
-						position: absolute;
-						right: 35px;
-						width: 42px;
-						height: 42px;
-						bottom: 0px;
-						z-index: 5;
-
-						.heart, .heart-large {
-							position: absolute;
-							width: 30px;
-							opacity: 0;
-							-webkit-backface-visibility: hidden;
-							backface-visibility: hidden;
-							-webkit-perspective: 1000;
-							perspective: 1000;
-
-							.heart-inner {
-								width: 30px;
-								height: 25px;
-								-webkit-background-size: cover;
-								background-size: cover;
-								-webkit-transform-origin: 100% 50%;
-								transform-origin: 100% 50%;
 							}
 
 						}

@@ -30,9 +30,9 @@ function refreshRem() {
 
 exports.refreshRem = function() {
 	var tid;
-	window.addEventListener('resize', function() {
-		clearTimeout(tid);
-		tid = setTimeout(refreshRem, 300);
-	}, false);
-	refreshRem();
+	// window.addEventListener('resize', function() {
+	// 	clearTimeout(tid);
+	// 	tid = setTimeout(refreshRem, 300);
+	// }, false);
+	//refreshRem();
 }

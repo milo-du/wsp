@@ -1,12 +1,12 @@
 <template>
     <div class="container">
-        <swiper :options="swiperOption" v-if="false">
+        <swiper :options="swiperOption" v-if="false" ref="bannerSwiper">
             <swiper-slide v-for="slide in swiperSlides" class="swiper-img-slide">
                 <img :src="slide"></swiper-slide>
             <div class="swiper-pagination" slot="pagination"></div>
         </swiper>
-        <div class="video-box">
-            <img :src="vedioInfo.img" class="video-cover" v-if="!showPlayer">   
+        <div class="video-box" ref="videoBox">
+            <img :src="vedioInfo.img" class="video-cover" v-if="!showPlayer">
             <a href="javascript:void(0)" class=
 
             "btn-play" v-if="!showPlayer" @click.prevent="handleShowPlayer">
@@ -16,9 +16,9 @@
                 <span class="videoicon seeuser"></span>
                 <span class="p-views">{{vedioInfo.pvNum || 0}}</span>
             </span>
-            <video ref="player" v-if="showPlayer" @click.prevent="play" v-on:playing="onPlaying" v-on:pause="onPause" v-on:waiting="onWaiting" v-on:timeupdate="onTimeupdate" :poster="vedioInfo.img" :src="vedioInfo.vodUrl" class="show-audio" loop="true" width="100%" preload="auto" type="video/mp4" playsinline="true" webkit-playsinline="true" x-webkit-airplay="true" x5-video-player-type="h5" x5-video-player-fullscreen="false"></video>
+            <video ref="player" v-if="showPlayer" @click.prevent="play" v-on:playing="onPlaying" v-on:pause="onPause" v-on:waiting="onWaiting" v-on:timeupdate="onTimeupdate" :poster="vedioInfo.img" :src="vedioInfo.vodUrl" class="show-audio" loop="true" width="100%" preload="auto" type="application/x-mpegURL" playsinline="true" webkit-playsinline="true" x-webkit-airplay="true" x5-video-player-type="h5" x5-video-player-fullscreen="false"></video>
         </div>
-        <div class="tab-box">
+        <div class="tab-box" ref="tabBox">
             <ul class="nav">
                 <li v-for="(item,index) in tabData.list">
                     <a href="javascript:void(0)" @click.prevent="handleClickNav(index)" class="on" v-if="item.key==tabData.index">{{item.value}}</a>
@@ -26,108 +26,112 @@
                 </li>
             </ul>
         </div>
+        <div class="fix-input-bar" ref="fixInputBar" v-if="tabData.index==0">
+            <ul class="op-box">
+                <li class="inputicon qqface" @click.prevent="handleShowQQFaceBox()"></li>
+                <li class="li-input thinborder">
+                    <input class="speakInput flex" type="text" v-model="cmtInput" @keydown="handleChooseIcon('[删除]',$event)" placeholder="来说点什么吧..."></li>
+                <li class="inputicon iconmore" @click.prevent="handleShowMoreBox()" v-if="!showSendBtn"></li>
+                <li class="btnLiveTalk" @click.prevent="sendCmt" v-if="showSendBtn">发送</li>
+            </ul>
+            <div class="qq-face-box" v-if="showQQFaceBox">
+                <swiper :options="qqFaceSwiperOption" class="qq-face-swiper">
+                    <swiper-slide v-for="(qqFaceSlide,index) in qqIconData" class="swiper-qq-face-slide">
+                        <template v-for="(qqIcon,childIndex) in qqFaceSlide">
+                            <span> <i class="qqface-img" v-if="qqIcon=='[删除]'" v-bind:data-code="qqIcon" style="background-position: left -4620px;" @click.prevent="handleChooseIcon(qqIcon)"></i> <i class="qqface-img" v-else v-bind:data-code="qqIcon" :style="{ backgroundPosition:'left '+(-(660*index+childIndex*33))+'px' }" @click.prevent="handleChooseIcon(qqIcon)"></i>
+                            </span>
+                        </template>
+                    </swiper-slide>
+                    <div class="swiper-pagination qqFace-swiper-pagination" slot="pagination"></div>
+                </swiper>
+            </div>
+            <div class="morebutton" v-if="showMoreBox">
+                <ul class="morebutton-wrap">
+                    <li>
+                        <a href="javascript:void(0)" class="inputicon redpacket" @click.prevent="handleShowRedBagBox"></a>
+                        <p>红包</p>
+                    </li>
+                    <li id="pickfiles-container">
+                        <a href="javascript:void(0)" class="inputicon photo" id="choose-img"></a>
+                        <p>图片</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="toolmenu" v-if="tabData.index==0">
+            <div class="rel side-icon">
+                <!--优惠券-->
+                <div class="animation-shake youhuiquan"></div>
+                <!--打赏对象-->
+                <a class="icon-live-yaoqing" href="/live/ShowExclusiveInvitaCard?topicId=281894"></a>
+                <a class="shangzhubo onlybtn icon-live-shang" @click.prevent="handleShowRewardRedpacket"></a>
+                <div v-bind:class="{'zan-box': true, 'icon-live-zan':true, 'icon-zan-bigger': liked}">
+                    <a class="zan-click" href="javascript:void(0);" @click.prevent="handleLike"> <em class="zan"><i class="iconfont"></i></em> 
+                    </a>
+                </div>
+                <span class="number zan-num" id="userpraise">{{vedioInfo.praiseNum || 0}}</span>
+            </div>
+        </div>
         <div class="slide-content">
             <swiper :options="contentSwiperOption" ref="contentSwiper" v-bind:class="{ notransform: tabData.index==0 }">
                 <swiper-slide class="tab1" ref="tab1" v-bind:style="{ height: scrollBoxHeight + 'px' }" v-scroll="onScroll">
                     <div class="chat-box" @click.prevent="handleClickChatBox()">
                         <ul class="chat-msg-list">
-                           <template v-for="item in commentList">
-                            <li class="d-flex" v-if="item.type==2">
-                                <div class="marry-chat-content clearfix d-flex">
-                                    <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
-                                    <div class="flex">
-                                        <span class="nickname">{{item.userNickName}}</span>
-                                        <div class="msg-content">
-                                            <img :src="item.pic" class="chat-msg-img"></div>
-                                    </div>
-                                </div>
-                            </li>     
-                            <li class="d-flex" v-if="item.type==1">
-                                <div class="marry-chat-content clearfix d-flex">
-                                    <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
-                                    <div class="flex">
-                                        <span class="nickname">{{item.userNickName}}</span>
-                                        <div class="msg-content" v-html="replaceContent(item.content)">
+                                <li class="d-flex" v-if="loadingChat">
+                                    <img src="/static/img/loading-chat.gif" class="loading-gif">
+                                </li>
+                            <template v-for="item in commentList">
+                                <li class="d-flex" v-if="item.type==2">
+                                    <div class="marry-chat-content clearfix d-flex">
+                                        <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
+                                        <div class="flex">
+                                            <span class="nickname">{{item.userNickName}}</span>
+                                            <div class="msg-content">
+                                                <img :src="item.pic" class="chat-msg-img"></div>
                                         </div>
                                     </div>
-                                </div>
-                            </li>                 
-                            <li class="d-flex" v-if="item.type==3">
-                                <div class="marry-chat-content clearfix d-flex">
-                                    <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
-                                    <div class="flex">
-                                        <span class="nickname">{{item.userNickName}}</span>
-                                        <div class="content-redpacket" @click.prevent="handleOpenRedpack(item.redPacketId)">
-                                            <ul class="bz d-flex rpna-ul hongbao">
-                                                <li class="rpna-pic">
-                                                    <img src="/static/img/hongbao_ico.png"></li>
-                                                <li class="flex">
-                                                    <p class="rena-wish">恭喜发财,大吉大利！</p>
-                                                    <p class="rena-get">
-                                                        <span>领取红包</span>
-                                                    </p>
-                                                </li>
-                                            </ul>
-                                            <div class="white-top">直播间红包</div>
+                                </li>
+                                <li class="d-flex" v-if="item.type==1">
+                                    <div class="marry-chat-content clearfix d-flex">
+                                        <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
+                                        <div class="flex">
+                                            <span class="nickname">{{item.userNickName}}</span>
+                                            <div class="msg-content" v-html="replaceContent(item.content)"></div>
                                         </div>
                                     </div>
-                                </div>
-                            </li>
-                            <li class="news-alert-time" v-if="item.type==10">
-                                <span>{{item.content}}</span>
-                            </li>
-                            <li class="recive-redpacket" v-if="item.type==4">
-                                <span><img class="icon-redpacket" src="/static/img/hongbao_ico.png" />
-                                你领取了{{item.redPacketUserNickName}}发的一个<em>红包</em></span>
-                            </li>                                                                               
-                           </template>
-                        </ul>
-                    </div>
-                    <div class="fix-input-bar">
-                        <ul class="op-box">
-                            <li class="inputicon qqface" @click.prevent="handleShowQQFaceBox()"></li>
-                            <li class="li-input thinborder">
-                                <input class="speakInput flex" type="text" v-model="cmtInput" @keydown="handleChooseIcon('[删除]',$event)" placeholder="来说点什么吧..."></li>
-                            <li class="inputicon iconmore" @click.prevent="handleShowMoreBox()" v-if="!showSendBtn"></li>
-                            <li class="btnLiveTalk" @click.prevent="sendCmt" v-if="showSendBtn">发送</li>
-                        </ul>
-                        <div class="qq-face-box" v-if="showQQFaceBox">
-                            <swiper :options="qqFaceSwiperOption" class="qq-face-swiper">
-                                <swiper-slide v-for="(qqFaceSlide,index) in qqIconData" class="swiper-qq-face-slide">
-                                    <template v-for="(qqIcon,childIndex) in qqFaceSlide">
-                                        <span> <i class="qqface-img" v-if="qqIcon=='[删除]'" v-bind:data-code="qqIcon" style="background-position: left -4620px;" @click.prevent="handleChooseIcon(qqIcon)"></i> <i class="qqface-img" v-else v-bind:data-code="qqIcon" :style="{ backgroundPosition:'left '+(-(660*index+childIndex*33))+'px' }" @click.prevent="handleChooseIcon(qqIcon)"></i>
-                                        </span>
-                                    </template>
-                                </swiper-slide>
-                                <div class="swiper-pagination qqFace-swiper-pagination" slot="pagination"></div>
-                            </swiper>
-                        </div>
-                        <div class="morebutton" v-if="showMoreBox">
-                            <ul class="morebutton-wrap">
-                                <li>
-                                    <a href="javascript:void(0)" class="inputicon redpacket" @click.prevent="handleShowRedBagBox"></a>
-                                    <p>红包</p>
                                 </li>
-                                <li id="pickfiles-container">
-                                    <a href="javascript:void(0)" class="inputicon photo" id="choose-img"></a>
-                                    <p>图片</p>
+                                <li class="d-flex" v-if="item.type==3">
+                                    <div class="marry-chat-content clearfix d-flex">
+                                        <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
+                                        <div class="flex">
+                                            <span class="nickname">{{item.userNickName}}</span>
+                                            <div class="content-redpacket" @click.prevent="handleOpenRedpack(item.redPacketId)">
+                                                <ul class="bz d-flex rpna-ul hongbao">
+                                                    <li class="rpna-pic">
+                                                        <img src="/static/img/hongbao_ico.png"></li>
+                                                    <li class="flex">
+                                                        <p class="rena-wish">恭喜发财,大吉大利！</p>
+                                                        <p class="rena-get">
+                                                            <span>领取红包</span>
+                                                        </p>
+                                                    </li>
+                                                </ul>
+                                                <div class="white-top">直播间红包</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="toolmenu">
-                        <div class="rel side-icon">
-                            <!--优惠券-->                
-                            <div class="animation-shake youhuiquan"></div>
-                            <!--打赏对象-->                
-                            <a class="icon-live-yaoqing" href="/live/ShowExclusiveInvitaCard?topicId=281894"></a>
-                            <a class="shangzhubo onlybtn icon-live-shang" @click.prevent="handleShowRewardRedpacket"></a>
-                            <div v-bind:class="{'zan-box': true, 'icon-live-zan':true, 'icon-zan-bigger': liked}">
-                                <a class="zan-click" href="javascript:void(0);" @click.prevent="handleLike"><em class="zan"><i class="iconfont"></i></em>
-                                </a>                                
-                            </div>
-                            <span class="number zan-num" id="userpraise">{{vedioInfo.praiseNum || 0}}</span>
-                        </div>
+                                <li class="news-alert-time" v-if="item.type==10">
+                                    <span>{{item.content}}</span>
+                                </li>
+                                <li class="recive-redpacket" v-if="item.type==4">
+                                    <span>
+                                        <img class="icon-redpacket" src="/static/img/hongbao_ico.png" />
+                                        你领取了{{item.redPacketUserNickName}}发的一个 <em @click.prevent="handleShowReciveRedpacketList(item.redPacketId)">红包</em>
+                                    </span>
+                                </li>
+                            </template>
+                        </ul>
                     </div>
                 </swiper-slide>
                 <swiper-slide class="tab2" v-bind:style="{ height: scrollBoxHeight + 'px' }">
@@ -135,25 +139,25 @@
                     <div class="detail-intro">
                         <p>
                             1 根据网络投票，进行出场顺序。投票最少的，最先开始比赛。
-                            <br>    
+                            <br>
                             2 第一轮演唱，每位选手演唱一首完整的歌。
-                            <br>    
+                            <br>
                             3 大众评审对选手进行投票，每位选手代表1票，共30票。
-                            <br>    
+                            <br>
                             4 三位评委进行投票，每位评委代表30票。
-                            <br>    
+                            <br>
                             5 第一轮结束后，按得票排名，排名前十位进入十强。
-                            <br>    
+                            <br>
                             6 其中，得票前两位这，直接进入巅峰对决。
-                            <br>    
+                            <br>
                             7得票排名最后的十五位直接淘汰。
-                            <br>    
+                            <br>
                             8 剩下八位选手依次清唱1分钟，评委选出3人，进入终极5人巅峰对决。
-                            <br>    
+                            <br>
                             9 此刻网络投票通道关闭。进入巅峰对决
-                            <br>    
+                            <br>
                             10 巅峰对决5位选手演依次演唱终极曲目。
-                            <br>    
+                            <br>
                             11 根据5位选手的演唱，依次进行打分，分数依次进行对比。
                             <br>12 最终留在台上的3位，就是南昌站三强。</p>
                     </div>
@@ -170,7 +174,7 @@
                     <swiper :options="listSwiperOption" ref="listSwiper">
                         <swiper-slide class="list-tab1">
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" class="table-banglist">
-                                <tbody>                       
+                                <tbody>
                                     <tr v-for="(item,index) in inviteRankList">
                                         <td style="width:0.45rem;" class="banglist-num">
                                             <img v-bind:src="'/static/img/list-' + (index+1)+'.png'" class="banglist-tag" v-if="index<3">
@@ -183,11 +187,12 @@
                                         </td>
                                         <td align="right">
                                             <span class="banglist-money">
-                                                邀请 <em>{{item.num}}</em>
+                                                邀请
+                                                <em>{{item.num}}</em>
                                                 人
                                             </span>
                                         </td>
-                                    </tr>                                          
+                                    </tr>
                                 </tbody>
                             </table>
                         </swiper-slide>
@@ -209,9 +214,9 @@
                                                 <em>¥{{item.money}}</em>
                                             </span>
                                         </td>
-                                    </tr>        
+                                    </tr>
                                 </tbody>
-                            </table>                           
+                            </table>
                         </swiper-slide>
                     </swiper>
                 </swiper-slide>
@@ -233,7 +238,7 @@
                     </h3>
                 </div>
                 <div class="popup-body">
-                    <img src="https://gss0.bdstatic.com/94o3dSag_xI4khGkpoWK1HF6hhy/baike/w%3D268%3Bg%3D0/sign=7bcb659c9745d688a302b5a29cf91a23/2934349b033b5bb571dc8c5133d3d539b600bc12.jpg">        
+                    <img src="https://gss0.bdstatic.com/94o3dSag_xI4khGkpoWK1HF6hhy/baike/w%3D268%3Bg%3D0/sign=7bcb659c9745d688a302b5a29cf91a23/2934349b033b5bb571dc8c5133d3d539b600bc12.jpg">
                     <p>关注后可收到直播最新动态哦</p>
                 </div>
             </div>
@@ -245,18 +250,19 @@
                 <ul>
                     <li class="d-flex line vcenter">
                         <span>红包个数</span>
-                        <input type="tel" v-model="sendRedPacketData.num" placeholder="填写红包个数,最多500个" max="500" class="flex inputbox" id="bagAmount" min="0">        
+                        <input type="tel" v-model="sendRedPacketData.num" placeholder="填写红包个数,最多500个" max="500" class="flex inputbox" id="bagAmount" min="0">
                         <span>个</span>
                     </li>
                     <li class="d-flex line vcenter">
-                        <span class="flex">红包类型：{{sendRedPacketData.type==1?'普通红包':'人气红包'}}</span>                        
+                        <span class="flex">红包类型：{{sendRedPacketData.type==1?'普通红包':'人气红包'}}</span>
                         <a href="javascript:void(0)" class="change-redpack-type" @click.prevent="handleChangeRedpackType">切换</a>
-                    </li>                    
+                    </li>
                     <li class="d-flex line vcenter">
                         <span class="totalmoney">
-                            总金额 <i><img src="/static/img/redpacketping.png"></i>
+                            总金额
+                            <i><img src="/static/img/redpacketping.png"></i>
                         </span>
-                        <input type="number" v-model="sendRedPacketData.money" placeholder="填写金额" class="flex inputbox" id="bagMoney" min="0">        
+                        <input type="number" v-model="sendRedPacketData.money" placeholder="填写金额" class="flex inputbox" id="bagMoney" min="0">
                         <span>元</span>
                     </li>
                     <li class="d-flex">
@@ -269,93 +275,109 @@
         <div class="recive-redpacket-box" v-if="showReciveRedpacketList">
             <div class="pop-mask" @click.prevent="handleHideReciveRedpacketList"></div>
             <div class="popup">
-               <img :src="reciveRedpacketData.redPackInfo && reciveRedpacketData.redPackInfo.headImgUrl" @error="imageLoadError" class="user-photo">
-               <a href="javascript:void(0)" class="close-redpack-btn" @click.prevent="handleHideReciveRedpacketList"></a>
-               <div class="content-info">
-                  <p class="nickname">{{reciveRedpacketData.redPackInfo && reciveRedpacketData.redPackInfo.nickName}}的红包<em v-if="reciveRedpacketData.redPackInfo && reciveRedpacketData.redPackInfo.type=='2'">拼</em></p>
-                  <p class="money">{{reciveRedpacketData.userReceiveMoney}}元</p>
-                  <div class="readpacket-title">{{reciveRedpacketData.displayWord}}</div>                  
-                  <ul class="user-list">
-                      <li class="flex user-item" v-for="item in reciveRedpacketData.redPacketLogList">
-                         <div class="user-item-photo">
-                           <img :src="item.receiverUserheadImgUrl" @error="imageLoadError">
-                         </div>
-                         <div class="user-info">
-                             <span class="nick-name">{{item.receiverUserNickName}}</span>
-                             <span class="time">{{item.ReceiveTime}}</span>
-                         </div>
-                         <div class="money-box">
-                           <span class="redpack-money">{{item.receiveMoney/100}}元</span>
-                           <span class="best-tip" v-if="item.isBestLuck==1">
-                             <em>手气最佳</em>
-                             <img src="/static/img/best.png" class="best-img">
-                           </span>
-                         </div>
-                      </li>
-                  </ul>
-               </div>               
+                <img :src="reciveRedpacketData.redPackInfo && reciveRedpacketData.redPackInfo.headImgUrl" @error="imageLoadError" class="user-photo">
+                <a href="javascript:void(0)" class="close-redpack-btn" @click.prevent="handleHideReciveRedpacketList"></a>
+                <div class="content-info">
+                    <p class="nickname">
+                        {{reciveRedpacketData.redPackInfo && reciveRedpacketData.redPackInfo.nickName}}的红包
+                        <em v-if="reciveRedpacketData.redPackInfo && reciveRedpacketData.redPackInfo.type=='2'">拼</em>
+                    </p>
+                    <p class="money">{{reciveRedpacketData.userReceiveMoney}}元</p>
+                    <div class="readpacket-title">{{reciveRedpacketData.displayWord}}</div>
+                    <ul class="user-list">
+                        <li class="flex user-item" v-for="item in reciveRedpacketData.redPacketLogList">
+                            <div class="user-item-photo">
+                                <img :src="item.receiverUserheadImgUrl" @error="imageLoadError"></div>
+                            <div class="user-info">
+                                <span class="nick-name">{{item.receiverUserNickName}}</span>
+                                <span class="time">{{item.ReceiveTime}}</span>
+                            </div>
+                            <div class="money-box">
+                                <span class="redpack-money">{{item.receiveMoney/100}}元</span>
+                                <span class="best-tip" v-if="item.isBestLuck==1">
+                                    <em>手气最佳</em>
+                                    <img src="/static/img/best.png" class="best-img"></span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>      
+        </div>
         <div class="reward-redpacket-box" v-if="showRewardRedpacketBox">
             <div class="pop-mask" @click.prevent="handleHideRewardRedpacket"></div>
             <div class="popup">
-               <img src="/static/img/defaultuser.jpg" class="user-photo">
-               <a href="javascript:void(0)" class="close-redpack-btn" @click.prevent="handleHideRewardRedpacket"></a>
-               <div class="content-info">
-                  <p class="nickname">小彩旗</p>
-                  <p class="p2">爱赞赏的人，运气不会太差~</p>          
-                  <ul class="flex money-select-list">
-                     <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(2)"><em>2</em>元</li>
-                     <li class="item-select-empty"></li>
-                     <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(5)"><em>5</em>元</li>
-                     <li class="item-select-empty"></li>
-                     <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(10)"><em>10</em>元</li>                     
-                  </ul>
-                  <ul class="flex money-select-list">
-                     <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(20)"><em>20</em>元</li>
-                     <li class="item-select-empty"></li>
-                     <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(50)"><em>50</em>元</li>
-                     <li class="item-select-empty"></li>
-                     <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(100)"><em>100</em>元</li>                     
-                  </ul>
-                  <a href="javascript:void(0)" class="other-money-btn" @click.prevent="handleShowRewardOtherMoneyBox">其他金额</a>
-               </div>               
+                <img src="/static/img/defaultuser.jpg" class="user-photo">
+                <a href="javascript:void(0)" class="close-redpack-btn" @click.prevent="handleHideRewardRedpacket"></a>
+                <div class="content-info">
+                    <p class="nickname">小彩旗</p>
+                    <p class="p2">爱赞赏的人，运气不会太差~</p>
+                    <ul class="flex money-select-list">
+                        <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(2)">
+                            <em>2</em>
+                            元
+                        </li>
+                        <li class="item-select-empty"></li>
+                        <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(5)">
+                            <em>5</em>
+                            元
+                        </li>
+                        <li class="item-select-empty"></li>
+                        <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(10)">
+                            <em>10</em>
+                            元
+                        </li>
+                    </ul>
+                    <ul class="flex money-select-list">
+                        <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(20)">
+                            <em>20</em>
+                            元
+                        </li>
+                        <li class="item-select-empty"></li>
+                        <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(50)">
+                            <em>50</em>
+                            元
+                        </li>
+                        <li class="item-select-empty"></li>
+                        <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(100)">
+                            <em>100</em>
+                            元
+                        </li>
+                    </ul>
+                    <a href="javascript:void(0)" class="other-money-btn" @click.prevent="handleShowRewardOtherMoneyBox">其他金额</a>
+                </div>
             </div>
-        </div>   
+        </div>
         <div class="reward-other-money-box" v-if="showRewardOtherMoneyBox">
             <div class="pop-mask" @click.prevent="handleHideRewardOtherMoneyBox"></div>
             <div class="popup">
-               <p class="p-title">其他金额</p>
-               <div class="flex input-box">
-                  <span>金额(元)</span>
-                  <input type="tel" placeholder="可填写2-100" v-model="rewardMoney">
-               </div>          
-               <a href="javascript:void(0)" class="btn-sure" @click.prevent="handleSubmitRewardOtherMoney">确定</a>
+                <p class="p-title">其他金额</p>
+                <div class="flex input-box">
+                    <span>金额(元)</span>
+                    <input type="tel" placeholder="可填写2-100" v-model="rewardMoney"></div>
+                <a href="javascript:void(0)" class="btn-sure" @click.prevent="handleSubmitRewardOtherMoney">确定</a>
             </div>
         </div>
         <div class="open-redpack-box" v-if="showOpenRedPackBox">
-            <div class="pop-mask"></div>            
+            <div class="pop-mask"></div>
             <div class="popup">
-               <a href="javascript:void(0)" class="close-redpack-btn" @click.prevent="handleCloseOpenRedpacketBox"></a>
-               <a href="javascript:void(0)" v-if="isSendEnd==0" class="open-redpack-btn" @click.prevent="handleOpenRedpacket">
-                 <img src="/static/img/open.png">
-               </a>
-               <img :src="redPackInfo.headImgUrl" @error="imageLoadError" class="user-photo">
-               <p class="p-title">suncz</p>
-               <template v-if="isSendEnd==0">
-                 <p class="p-title2">发了一个红包，金额随机</p>               
-                 <p class="p-title3">恭喜发财，大吉大利！</p>               
-               </template>
-               <template v-else>
-                 <p class="p-title3">手慢了，红包派完了</p>               
-               </template>
-               <a href="javascript:void(0)" class="btn-sure" @click.prevent="handleShowReciveRedpacketList()">看看大家的手气></a>
+                <a href="javascript:void(0)" class="close-redpack-btn" @click.prevent="handleCloseOpenRedpacketBox"></a>
+                <a href="javascript:void(0)" v-if="isSendEnd==0" class="open-redpack-btn" @click.prevent="handleOpenRedpacket">
+                    <img src="/static/img/open.png"></a>
+                <img :src="redPackInfo.headImgUrl" @error="imageLoadError" class="user-photo">
+                <p class="p-title">suncz</p>
+                <template v-if="isSendEnd==0">
+                    <p class="p-title2">发了一个红包，金额随机</p>
+                    <p class="p-title3">恭喜发财，大吉大利！</p>
+                </template>
+                <template v-else>
+                    <p class="p-title3">手慢了，红包派完了</p>
+                </template>
+                <a href="javascript:void(0)" class="btn-sure" @click.prevent="handleShowReciveRedpacketList()">看看大家的手气></a>
             </div>
-        </div>                          
+        </div>
         <div class="load-box" v-if="showLoading">
-            <div class="pop-mask"></div>            
-            <img src="/static/img/loading.gif" class="loadimg">
-        </div>        
+            <div class="pop-mask"></div>
+            <img src="/static/img/loading.gif" class="loadimg"></div>
     </div>
 </template>
 <script>
@@ -376,8 +398,7 @@ export default {
                 opacity: "1",
                 transform: "translate3d(0px, 0px, 0px)"
             },
-            liked: false,
-            testHtml:"[微笑]aaaa[撇嘴]bbb",
+            liked: false,            
             showQQFaceBox:false,
             showMoreBox:false,
             showSendBtn:false,
@@ -467,12 +488,18 @@ export default {
             showRewardOtherMoneyBox:false,
             rewardMoney:'',
             showReciveRedpacketList:false,
-            reciveRedpacketData:{}
+            reciveRedpacketData:{},
+            loadingChat:false
         }
     },
     created() {
         document.title = '首页';
-        this.loadData();              
+        this.loadData();
+        this.resetChatBox();
+        console.log(window.screen.availHeight+'|'+ window.screen.height);
+        window.addEventListener('resize', function() {     
+          this.resetChatBox();
+        }.bind(this), false);        
     },
     watch:{
         'cmtInput': function(c, o) {
@@ -515,6 +542,19 @@ export default {
         }
     },
     methods: {
+        resetChatBox:function(){
+            this.$nextTick(function() {
+               console.log('reset');
+               var bannerHeight = this.$refs.bannerSwiper && this.$refs.bannerSwiper.offsetHeight || 0,
+                   fixInputBarHeight = this.$refs.fixInputBar.offsetHeight,
+                   tabBoxHeight = this.$refs.tabBox.offsetHeight,
+                   videoBoxHeight = this.$refs.videoBox.offsetHeight,
+                   h = bannerHeight + fixInputBarHeight + tabBoxHeight + videoBoxHeight,
+                   clientHeight = window.screen.height,
+                   chatBoxHeight = clientHeight - h;
+               this.scrollBoxHeight = chatBoxHeight;          
+          });
+        },
         reload:function(){
             window.location.reload();
         },
@@ -544,6 +584,7 @@ export default {
         },
         handleHideReciveRedpacketList:function(){
             this.showReciveRedpacketList = false;
+            this.reciveRedpacketData={};
         },        
         handleShowRewardOtherMoneyBox:function(){
             this.showRewardOtherMoneyBox = true;
@@ -1121,6 +1162,7 @@ export default {
                         formData.type = 'old';
                         formData.commentId = commentList[0].id;                        
                         formData.timeReferencePointLine = timeReferenceArr[0].timeReferencePointLine;
+                        this.loadingChat = false;
                     }
                     break;
             }
@@ -1167,7 +1209,10 @@ export default {
         },
         onScroll:function(e, position){
             if(position.scrollTop==0){
-                this.loadComment('old');
+                this.loadingChat = true;
+                setTimeout(()=>{
+                   this.loadComment('old');
+                },1500);                
             }
         }
     }
