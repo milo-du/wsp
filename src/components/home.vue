@@ -758,6 +758,9 @@ export default {
              // var userInfo = window.localStorage.getItem('USER_INFO') || {uid:4,token:'6b66a23682144c04dd60d02ed87645db'};
              return userInfo;
         },
+        jumpLogin:function(){
+            location.href='/home/publicity/'+this.videoId;
+        },
         request: function(options) {
             options.data = options.data || {};
             var url = options.url;
@@ -770,12 +773,24 @@ export default {
             }
 
             if (options.type == 'post') {
-                options.emulateJSON = true;
-                return this.$http.post(url, options.data, options);
-            } else {
+                options.emulateJSON = true;                
+                return this.$http.post(url, options.data, options).then(function(res) {
+                  if (res.body.ret == 1000) {
+                    this.jumpLogin();
+                  } else {
+                    return res;
+                  }
+                }.bind(this));
+            } else {              
                 return this.$http.get(url, {
                     params: options.data
-                });
+                }).then(function(res) {
+                   if (res.body.ret == 1000) {
+                      this.jumpLogin();
+                   } else {
+                       return res;
+                  }
+                }.bind(this));
             }
         },
         initUploader:function(elementID){
