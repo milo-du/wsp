@@ -543,8 +543,7 @@ export default {
     },
     methods: {
         resetChatBox:function(){
-            this.$nextTick(function() {
-               console.log('reset');
+            this.$nextTick(function() {               
                var bannerHeight = this.$refs.bannerSwiper && this.$refs.bannerSwiper.offsetHeight || 0,
                    fixInputBarHeight = this.$refs.fixInputBar.offsetHeight,
                    tabBoxHeight = this.$refs.tabBox.offsetHeight,
@@ -822,14 +821,7 @@ export default {
                         }
                     });
                     return token;
-                }.bind(this),
-                filters: {
-                    mime_types: [{
-                            title: "Image files",
-                            extensions: "jpg,gif,png"
-                        }, // 限定jpg,gif,png后缀上传
-                    ]
-                },                
+                }.bind(this),                         
                 get_new_uptoken: true, // 设置上传文件的时候是否每次都重新获取新的uptoken
                 // downtoken_url: '/downtoken',
                 // Ajax请求downToken的Url，私有空间时使用，JS-SDK将向该地址POST文件的key和domain，服务端返回的JSON必须包含url字段，url值为该文件的下载地址
@@ -864,11 +856,7 @@ export default {
                         this.postCmt('',imgUrl);
                     }.bind(this),
                     'Error': function(up, err, errTip) {
-                        var result = JSON.parse(err.response);
-                        page.showError(result.error);
-                        var btn = up.getOption('browse_button')[0];
-                        btn.disabled = false;
-                        btn.innerHTML = '<img src="/static/images/add.png">';
+                        var result = JSON.parse(err.response);                                                
                     },
                     'UploadComplete': function() {
                         //队列文件处理完毕后，处理相关的事情
