@@ -16,6 +16,13 @@
                 <span class="videoicon seeuser"></span>
                 <span class="p-views">{{vedioInfo.pvNum || 0}}</span>
             </span>
+            <div class="video-zan-box">
+                <div v-bind:class="{'zan-box': true, 'icon-live-zan':true, 'icon-zan-bigger': liked}">
+                    <a class="zan-click" href="javascript:void(0);" @click.prevent="handleLike"> <em class="zan"><i class="iconfont"></i></em> 
+                    </a>
+                </div>
+                <span class="number zan-num" id="userpraise">{{vedioInfo.praiseNum || 0}}</span>                
+            </div>
             <video ref="player" v-if="showPlayer" @click.prevent="play" v-on:playing="onPlaying" v-on:pause="onPause" v-on:waiting="onWaiting" v-on:timeupdate="onTimeupdate" :poster="vedioInfo.img" :src="vedioInfo.vodUrl" class="show-audio" loop="true" width="100%" preload="auto" type="application/x-mpegURL" playsinline="true" webkit-playsinline="true" x-webkit-airplay="true" x5-video-player-type="h5" x5-video-player-fullscreen="false"></video>
         </div>
         <div class="tab-box" ref="tabBox">
@@ -65,11 +72,6 @@
                 <!--打赏对象-->
                 <a class="icon-live-yaoqing" href="/live/ShowExclusiveInvitaCard?topicId=281894"></a>
                 <a class="shangzhubo onlybtn icon-live-shang" @click.prevent="handleShowRewardRedpacket"></a>
-                <div v-bind:class="{'zan-box': true, 'icon-live-zan':true, 'icon-zan-bigger': liked}">
-                    <a class="zan-click" href="javascript:void(0);" @click.prevent="handleLike"> <em class="zan"><i class="iconfont"></i></em> 
-                    </a>
-                </div>
-                <span class="number zan-num" id="userpraise">{{vedioInfo.praiseNum || 0}}</span>
             </div>
         </div>
         <div class="slide-content">
@@ -134,7 +136,7 @@
                         </ul>
                     </div>
                 </swiper-slide>
-                <swiper-slide class="tab2" v-bind:style="{ height: scrollBoxHeight + 'px' }">
+                <swiper-slide class="tab2" v-bind:style="{ height: scrollBoxHeight2 + 'px' }">
                     <h2>直播介绍</h2>
                     <div class="detail-intro">
                         <p>
@@ -162,7 +164,7 @@
                             <br>12 最终留在台上的3位，就是南昌站三强。</p>
                     </div>
                 </swiper-slide>
-                <swiper-slide class="tab3" v-bind:style="{ height: scrollBoxHeight + 'px' }">
+                <swiper-slide class="tab3" v-bind:style="{ height: scrollBoxHeight2 + 'px' }">
                     <ul class="tab3-title">
                         <li>
                             <a href="javascript:void(0)" @click.prevent="handleSwitchNav(0)" v-bind:class="{ on: isActive==0 }">邀请榜</a>
@@ -220,11 +222,8 @@
                         </swiper-slide>
                     </swiper>
                 </swiper-slide>
-                <swiper-slide class="tab4" v-bind:style="{ height: scrollBoxHeight + 'px' }">
-                    <p>
-                        &nbsp; &nbsp; &nbsp; <b>江西微彩传媒有限公司</b>
-                        是一家专业提供各行业视频直播的传媒公司。公司的直播平台基于微信端平台，看直播无需下载APP，无需充值就可以直接用微信零钱收发红包，在直播间粉丝可以评论、打赏红包及礼物，同时还有投票、抽奖等等功能。其中一些特定行业还有专属模板，这个平台就类似一家小型电视台。2017年将是直播大年，直播将会是文化公司，传媒公司，婚庆公司等等必备的一大武器。加入我们，让你企业形象声名远扬。合作咨询电话：18779291518王
-                    </p>
+                <swiper-slide class="tab4" v-bind:style="{ height: scrollBoxHeight2 + 'px' }">
+                    <div v-html="cooperation" class="cooperation-html"></div>
                 </swiper-slide>
             </swiper>
         </div>
@@ -378,6 +377,10 @@
         <div class="load-box" v-if="showLoading">
             <div class="pop-mask"></div>
             <img src="/static/img/loading.gif" class="loadimg"></div>
+        <div class="toast-box" v-if="toastTxt.length>0">
+            <div class="pop-mask"></div>
+            <span class="toast-text">{{toastTxt}}</span>
+        </div>
     </div>
 </template>
 <script>
@@ -391,9 +394,13 @@ export default {
     },
     data() {
         return {
+            toastTid:null,
+            toastTxt:'',
             showOpenRedPackBox:false,
             showLoading:false,
-            scrollBoxHeight:409,
+            scrollBoxHeight:0,
+            scrollBoxHeight2:0,
+            cooperation:'',
             heartStyle:{
                 opacity: "1",
                 transform: "translate3d(0px, 0px, 0px)"
@@ -495,11 +502,13 @@ export default {
     created() {
         document.title = '首页';
         this.loadData();
-        this.resetChatBox();
-        console.log(window.screen.availHeight+'|'+ window.screen.height);
+        this.resetChatBox();        
         window.addEventListener('resize', function() {     
           this.resetChatBox();
-        }.bind(this), false);        
+        }.bind(this), false);
+        setInterval(()=>{
+            this.loadComment('new');
+        },3000);        
     },
     watch:{
         'cmtInput': function(c, o) {
@@ -542,6 +551,15 @@ export default {
         }
     },
     methods: {
+        showToast: function(txt) {
+            this.toastTxt = txt;
+            if (this.toastTid != null) {
+                clearTimeout(this.toastTid);
+            }
+            this.toastTid = setTimeout(() => {
+                this.toastTxt = '';
+            }, 2000);
+        },
         resetChatBox:function(){
             this.$nextTick(function() {               
                var bannerHeight = this.$refs.bannerSwiper && this.$refs.bannerSwiper.offsetHeight || 0,
@@ -551,7 +569,8 @@ export default {
                    h = bannerHeight + fixInputBarHeight + tabBoxHeight + videoBoxHeight,
                    clientHeight = window.screen.height,
                    chatBoxHeight = clientHeight - h;
-               this.scrollBoxHeight = chatBoxHeight;          
+               this.scrollBoxHeight = chatBoxHeight;
+               this.scrollBoxHeight2 = chatBoxHeight + fixInputBarHeight;     
           });
         },
         reload:function(){
@@ -573,11 +592,11 @@ export default {
                        this.reciveRedpacketData = res.data;
                     }
                     else{
-                        alert(res.msg);
+                        this.showToast(res.msg);
                     }
                 }.bind(this),
                 function(err) {
-                    alert('服务器错误');
+                    this.showToast('服务器错误');
                 }.bind(this))             
             this.showReciveRedpacketList = true;
         },
@@ -612,11 +631,11 @@ export default {
                         this.handleShowReciveRedpacketList();
                     }
                     else{
-                        alert(res.msg);
+                        this.showToast(res.msg);
                     }
                 }.bind(this),
                 function(err) {
-                    alert('服务器错误');
+                    this.showToast('服务器错误');
                 }.bind(this))             
         },
         handleCloseOpenRedpacketBox:function(){
@@ -633,7 +652,7 @@ export default {
                     res = res.data;
                     if (res.ret == 0) {
                        if(res.data.isExpired==1){
-                         alert('红包已超过24小时,不能查看！');
+                         this.showToast('红包已超过24小时,不能查看！');
                        }else{
                            if(res.data.isReceived==1){
                               this.handleShowReciveRedpacketList(redPacketId);
@@ -646,11 +665,11 @@ export default {
                        }
                     }
                     else{
-                        alert(res.msg);
+                        this.showToast(res.msg);
                     }
                 }.bind(this),
                 function(err) {
-                    alert('服务器错误');
+                    this.showToast('服务器错误');
                 }.bind(this))            
         },
         handleHideSendRedPacketBox:function(){
@@ -683,7 +702,7 @@ export default {
                     }
                 }.bind(this),
                 function(err) {
-                    alert('服务器错误');
+                    this.showToast('服务器错误');
                 }.bind(this))                   
         },
         handleChangeRedpackType:function(){
@@ -758,7 +777,7 @@ export default {
              return userInfo;
         },
         jumpLogin:function(){
-            location.href='/home/publicity/'+this.videoId;
+            location.href = CONFIG.DOMAIN.API +'/home/publicity/'+this.videoId;
         },
         request: function(options) {
             options.data = options.data || {};
@@ -904,11 +923,11 @@ export default {
                         }.bind(this), 200);
                     }
                     else{
-                        alert(res.msg);
+                        this.showToast(res.msg);
                     }
                 }.bind(this),
                 function(err) {
-                    alert('服务器错误');
+                    this.showToast('服务器错误');
                 }.bind(this))
         },
         handleCloseReciveRedpacketBox:function(){
@@ -950,11 +969,11 @@ export default {
                         this.loadComment('new');
                     }
                     else{
-                        alert(res.msg);
+                        this.showToast(res.msg);
                     }                    
                 }.bind(this),
                 function(err) {
-                    alert(err);
+                    this.showToast(err);
                 }.bind(this))             
         },
         handleSubmitRewardOtherMoney:function(money){
@@ -964,7 +983,7 @@ export default {
                 this.postRedPacket(money);
             }
            else{
-               alert('请输入打赏金额');
+               this.showToast('请输入打赏金额');
             }
         },
         postRedPacket:function(money){
@@ -979,15 +998,15 @@ export default {
             }).then(function(res) {
                     res = res.data;
                     if (res.ret == 0) {                        
-                        alert('打赏成功');
+                        this.showToast('打赏成功');
                         this.closeAllPop();
                     }
                     else{
-                        alert(res.msg);
+                        this.showToast(res.msg);
                     }                    
                 }.bind(this),
                 function(err) {
-                    alert(err);
+                    this.showToast(err);
                 }.bind(this))             
         },        
         sendCmt:function(){            
@@ -1086,11 +1105,11 @@ export default {
                         this.rewardRankList = res.userRankList;                        
                     }
                     else{
-                        alert(res.msg);
+                        this.showToast(res.msg);
                     }                    
                 }.bind(this),
                 function(err) {
-                    alert('服务器错误');
+                    this.showToast('服务器错误');
                 }.bind(this))
         },
         loadInviteRank:function(){
@@ -1106,11 +1125,11 @@ export default {
                         this.inviteRankList = res.userRankList;
                     }
                     else{
-                        alert(res.msg);
+                        this.showToast(res.msg);
                     }                    
                 },
                 function(err) {
-                    alert('服务器错误');
+                    this.showToast('服务器错误');
                 })
         },
         loadVideo() {
@@ -1124,13 +1143,14 @@ export default {
                     res = res.data;
                     if (res.ret == 0) {
                         this.vedioInfo = res.data.vedioInfo;
+                        this.cooperation = res.data.cooperation;
                     }
                     else{
-                        alert(res.msg);
+                        this.showToast(res.msg);
                     }                    
                 },
                 function(err) {
-                    alert('服务器错误');
+                    this.showToast('服务器错误');
                 })
         },
         loadComment(type) {
@@ -1202,11 +1222,11 @@ export default {
                         }
                     }
                     else{
-                        alert(res.msg);
+                        this.showToast(res.msg);
                     }
                 }.bind(this),
                 function(err) {
-                    alert('服务器错误');
+                    this.showToast('服务器错误');
                     this.startLoadData = false;
                 }.bind(this))
         },

@@ -21,7 +21,7 @@ function refreshRem() {
 		docEl = doc.documentElement,
 		width = docEl.getBoundingClientRect().width;
 	if (width > 540) { // 最大宽度
-		width = 540;
+		width = 420;
 	}
 	var rem = width / 3.75; // iPhone6比例
 	docEl.style.fontSize = rem + 'px';
@@ -30,9 +30,9 @@ function refreshRem() {
 
 exports.refreshRem = function() {
 	var tid;
-	// window.addEventListener('resize', function() {
-	// 	clearTimeout(tid);
-	// 	tid = setTimeout(refreshRem, 300);
-	// }, false);
-	//refreshRem();
+	window.addEventListener('resize', function() {
+		clearTimeout(tid);
+		tid = setTimeout(refreshRem, 300);
+	}, false);
+	refreshRem();
 }
