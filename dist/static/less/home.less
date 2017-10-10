@@ -76,6 +76,55 @@ ul, li {
 
 	}
 
+	.video-zan-box {
+		position: absolute;
+		right: 0.1rem;
+		top: 0.8rem;
+
+		a {
+			width: 0.35rem;
+			height: 0.35rem;
+			display: block;
+			outline: none;
+		}
+
+		.icon-live-zan {
+			background: url(/static/img/ioc-2.0.png) -4.48rem -2.96rem no-repeat;
+			background-size: 5rem;
+			margin-top: 0.04rem;
+			transition: All 0.2s ease-in-out;
+			-webkit-transition: All 0.2s ease-in-out;
+			-moz-transition: All 0.2s ease-in-out;
+			-o-transition: All 0.2s ease-in-out;
+			outline: none;
+		}
+
+		.icon-zan-bigger {
+			transform: scale(1.2);
+			-webkit-transform: scale(1.2);
+			-moz-transform: scale(1.2);
+			-o-transform: scale(1.2);
+			-ms-transform: scale(1.2);
+		}
+
+		.number {
+			position: absolute;
+			min-width: 0.35rem;
+			font-size: 0.1rem;
+			display: block;
+			color: #fff;
+			line-height: 0.13rem;
+			text-align: center;
+			border-radius: 10px;
+			background: grey;
+			right: 0;
+			padding: 0.02rem 0.04rem;
+			white-space: nowrap;
+			margin-top: 0.04rem;
+		}
+
+	}
+
 }
 
 .toolmenu {
@@ -95,22 +144,6 @@ ul, li {
 			height: 0.35rem;
 			display: block;
 			outline: none;
-		}
-
-		.number {
-			position: absolute;
-			min-width: 0.35rem;
-			font-size: 0.1rem;
-			display: block;
-			color: #fff;
-			line-height: 0.13rem;
-			text-align: center;
-			border-radius: 10px;
-			background: grey;
-			right: 0;
-			padding: 0.02rem 0.04rem;
-			white-space: nowrap;
-			margin-top: 0.04rem;
 		}
 
 		.youhuiquan {
@@ -138,25 +171,6 @@ ul, li {
 		.qianghongbao {
 			width: 0.35rem;
 			max-width: none;
-		}
-
-		.icon-live-zan {
-			background: url(/static/img/ioc-2.0.png) -4.48rem -2.96rem no-repeat;
-			background-size: 5rem;
-			margin-top: 0.04rem;
-			transition: All 0.2s ease-in-out;
-			-webkit-transition: All 0.2s ease-in-out;
-			-moz-transition: All 0.2s ease-in-out;
-			-o-transition: All 0.2s ease-in-out;
-			outline: none;
-		}
-
-		.icon-zan-bigger {
-			transform: scale(1.2);
-			-webkit-transform: scale(1.2);
-			-moz-transform: scale(1.2);
-			-o-transform: scale(1.2);
-			-ms-transform: scale(1.2);
 		}
 
 		.j-likes-animation-wrap {
@@ -457,9 +471,9 @@ ul, li {
 				padding: 0 0.1rem;
 
 				.loading-gif {
-					 width: 16px;
-					 height: 16px;
-					 margin: 0 auto;
+					width: 16px;
+					height: 16px;
+					margin: 0 auto;
 				}
 
 				li {
@@ -779,12 +793,6 @@ ul, li {
 
 	.tab4 {
 		overflow-y: scroll;
-
-		p {
-			margin: 0.2rem 0.1rem;
-			font-size: 0.15rem;
-		}
-
 	}
 
 }
@@ -1406,6 +1414,33 @@ ul, li {
 		top: 50%;
 		margin-left: -0.26rem;
 		margin-top: -0.26rem;
+	}
+
+}
+
+.toast-box {
+	.pop-mask{
+		z-index: 999999;
+	}
+	.toast-text {
+		position: fixed;
+		z-index: 9999999;
+		color: white;
+		top: 50%;
+		left: 50%;
+		padding: 0.05rem 0.1rem;
+		border-radius: 0.05rem;
+		background-color: rgba(0, 0, 0, 0.8);
+		transform: translateY(-50%);
+		-ms-transform: translateY(-50%);
+		-moz-transform: translateY(-50%);
+		-webkit-transform: translateY(-50%);
+		-o-transform: translateY(-50%);
+		transform: translateX(-50%);
+		-ms-transform: translateX(-50%);
+		-moz-transform: translateX(-50%);
+		-webkit-transform: translateX(-50%);
+		-o-transform: translateX(-50%);		
 	}
 
 }
