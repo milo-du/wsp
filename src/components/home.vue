@@ -23,7 +23,7 @@
                 </div>
                 <span class="number zan-num" id="userpraise">{{vedioInfo.praiseNum || 0}}</span>                
             </div>
-            <video ref="player" v-if="showPlayer" @click.prevent="play" v-on:playing="onPlaying" v-on:pause="onPause" v-on:waiting="onWaiting" v-on:timeupdate="onTimeupdate" :poster="vedioInfo.img" :src="vedioInfo.vodUrl" class="show-audio" loop="true" width="100%" preload="auto" type="application/x-mpegURL" playsinline="true" webkit-playsinline="true" x-webkit-airplay="true" x5-video-player-type="h5" x5-video-player-fullscreen="false"></video>
+            <video ref="player" v-if="showPlayer" controls="controls" @click.prevent="play" v-on:playing="onPlaying" v-on:pause="onPause" v-on:waiting="onWaiting" v-on:timeupdate="onTimeupdate" :poster="vedioInfo.img" :src="vedioInfo.vodUrl" class="show-audio" loop="true" width="100%" preload="auto" type="application/x-mpegURL" playsinline="true" webkit-playsinline="true" x-webkit-airplay="true" x5-video-player-type="h5" x5-video-player-fullscreen="true"></video>
         </div>
         <div class="tab-box" ref="tabBox">
             <ul class="nav">
@@ -37,7 +37,7 @@
             <ul class="op-box">
                 <li class="inputicon qqface" @click.prevent="handleShowQQFaceBox()"></li>
                 <li class="li-input thinborder">
-                    <input class="speakInput flex" type="text" v-model="cmtInput" @keydown="handleChooseIcon('[删除]',$event)" placeholder="来说点什么吧..."></li>
+                    <input class="speakInput flex" ref="chatInput" type="text" v-model="cmtInput" @keydown="handleChooseIcon('[删除]',$event)" placeholder="来说点什么吧..." @click="handleInputClick"></li>
                 <li class="inputicon iconmore" @click.prevent="handleShowMoreBox()" v-if="!showSendBtn"></li>
                 <li class="btnLiveTalk" @click.prevent="sendCmt" v-if="showSendBtn">发送</li>
             </ul>
@@ -76,8 +76,7 @@
         </div>
         <div class="slide-content">
             <swiper :options="contentSwiperOption" ref="contentSwiper" v-bind:class="{ notransform: tabData.index==0 }">
-                <swiper-slide class="tab1" ref="tab1" v-bind:style="{ height: scrollBoxHeight + 'px' }" v-scroll="onScroll">
-                    <div class="chat-box" @click.prevent="handleClickChatBox()">
+                <swiper-slide class="tab1" ref="tab1" v-bind:style="{ height: scrollBoxHeight + 'px' }" v-scroll="onScroll" @click.prevent="handleClickChatBox()">                    
                         <ul class="chat-msg-list">
                                 <li class="d-flex" v-if="loadingChat">
                                     <img src="/static/img/loading-chat.gif" class="loading-gif">
@@ -133,35 +132,11 @@
                                     </span>
                                 </li>
                             </template>
-                        </ul>
-                    </div>
+                        </ul>                    
                 </swiper-slide>
                 <swiper-slide class="tab2" v-bind:style="{ height: scrollBoxHeight2 + 'px' }">
                     <h2>直播介绍</h2>
-                    <div class="detail-intro">
-                        <p>
-                            1 根据网络投票，进行出场顺序。投票最少的，最先开始比赛。
-                            <br>
-                            2 第一轮演唱，每位选手演唱一首完整的歌。
-                            <br>
-                            3 大众评审对选手进行投票，每位选手代表1票，共30票。
-                            <br>
-                            4 三位评委进行投票，每位评委代表30票。
-                            <br>
-                            5 第一轮结束后，按得票排名，排名前十位进入十强。
-                            <br>
-                            6 其中，得票前两位这，直接进入巅峰对决。
-                            <br>
-                            7得票排名最后的十五位直接淘汰。
-                            <br>
-                            8 剩下八位选手依次清唱1分钟，评委选出3人，进入终极5人巅峰对决。
-                            <br>
-                            9 此刻网络投票通道关闭。进入巅峰对决
-                            <br>
-                            10 巅峰对决5位选手演依次演唱终极曲目。
-                            <br>
-                            11 根据5位选手的演唱，依次进行打分，分数依次进行对比。
-                            <br>12 最终留在台上的3位，就是南昌站三强。</p>
+                    <div class="detail-intro cooperation-html" v-html="vedioInfo.introduce">
                     </div>
                 </swiper-slide>
                 <swiper-slide class="tab3" v-bind:style="{ height: scrollBoxHeight2 + 'px' }">
@@ -496,7 +471,7 @@ export default {
             rewardMoney:'',
             showReciveRedpacketList:false,
             reciveRedpacketData:{},
-            loadingChat:false
+            loadingChat:true
         }
     },
     created() {
@@ -575,6 +550,11 @@ export default {
         },
         reload:function(){
             window.location.reload();
+        },
+        handleInputClick:function(){            
+           // setTimeout(function(){
+           //   this.$refs.chatInput.scrollIntoViewIfNeeded();             
+           // }.bind(this),200);
         },
         handleShowReciveRedpacketList:function(redPacketId){
             var redPacketId = redPacketId || this.redPackInfo.id;            
@@ -902,9 +882,17 @@ export default {
         imageLoadError: function(e) {
            e.target.src = '/static/img/defaultuser.jpg';
         },
-        handleShowPlayer:function(){
-            this.showPlayer = true;
-        },
+        handleShowPlayer:function(){            
+            if (!this.showPlayer) {
+                    this.showPlayer = true;
+                    var that = this;
+                    this.$nextTick(function() {
+                        that.play();
+                    });
+                } else {
+                    this.play();
+            }            
+        },      
         handleLike: function() {
             this.request({
                 type: 'post',
@@ -1012,7 +1000,7 @@ export default {
         sendCmt:function(){            
            this.postCmt(this.cmtInput,'');
         },
-        handleChooseIcon: function(iconCode, event) {
+        handleChooseIcon: function(iconCode, event) {            
             if (event) {
                 if (event.keyCode != 8) {
                     return;
@@ -1153,10 +1141,7 @@ export default {
                     this.showToast('服务器错误');
                 })
         },
-        loadComment(type) {
-            if (this.startLoadData) {
-                return;
-            }
+        loadComment(type) {       
             var formData = {
                 videoId: this.videoId
             };
@@ -1185,38 +1170,42 @@ export default {
                         formData.type = 'old';
                         formData.commentId = commentList[0].id;                        
                         formData.timeReferencePointLine = timeReferenceArr[0].timeReferencePointLine;
-                        this.loadingChat = false;
                     }
                     break;
-            }
-            this.startLoadData = true;
+            }            
             this.request({
                 url: 'commentNew/commentList',
                 withToken: true,
                 data: formData
-            }).then(function(res) {
-                    this.startLoadData = false;
+            }).then(function(res) {                    
                     res = res.data;
                     res.data = res.data.reverse();
                     if (res.ret == 0) {
                         switch (type) {
                             case 'firstLoad':
                                 {
-                                    this.commentList = res.data;
+                                    this.commentList = res.data;                                    
+                                    this.$nextTick(function(){                                        
+                                       this.$refs.tab1.$el.scrollTop = this.$refs.tab1.$el.scrollHeight;
+                                    });           
                                 }
                                 break;
                             case 'new':
                                 {
+                                  if(res.data.length>0)
+                                  {
                                     this.commentList = this.commentList.concat(res.data);
                                     this.$nextTick(function(){
                                        this.$refs.tab1.$el.scrollTop = this.$refs.tab1.$el.scrollHeight;
                                     });              
                                     this.closeAllPop();                                  
+                                  }
                                 }
                                 break;
                             case 'old':
                                 {
                                     this.commentList = res.data.concat(this.commentList);
+                                    this.loadingChat = false;
                                 }
                                 break;
                         }
@@ -1226,8 +1215,7 @@ export default {
                     }
                 }.bind(this),
                 function(err) {
-                    this.showToast('服务器错误');
-                    this.startLoadData = false;
+                    this.showToast('服务器错误');                    
                 }.bind(this))
         },
         onScroll:function(e, position){

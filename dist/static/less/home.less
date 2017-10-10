@@ -457,205 +457,201 @@ ul, li {
 	.tab1 {
 		background-color: #ebebeb;
 		overflow-y: scroll;
+		-webkit-overflow-scrolling: touch;
 
 		&::-webkit-scrollbar {
 			display: none;
 		}
 
-		.chat-box {
-			padding-bottom: 0.8rem;
-			padding-top: 0.2rem;
+		.chat-msg-list {
+			font-size: 0.15rem;
+			padding: 0 0.1rem;
+			padding-top: 0.2rem;			
 
-			.chat-msg-list {
-				font-size: 0.15rem;
-				padding: 0 0.1rem;
+			.loading-gif {
+				width: 16px;
+				height: 16px;
+				margin: 0 auto;
+			}
 
-				.loading-gif {
-					width: 16px;
-					height: 16px;
-					margin: 0 auto;
+			li {
+				margin-bottom: 0.12rem;
+				position: relative;
+
+				&.news-alert-time {
+					font-size: 0.12rem;
+					text-align: center;
+
+					span {
+						color: #999;
+						display: inline-block;
+						border-radius: 3px;
+						padding: 0.01rem 0.16rem;
+					}
+
 				}
 
-				li {
-					margin-bottom: 0.12rem;
-					position: relative;
+				&.recive-redpacket {
+					font-size: 0.12rem;
+					text-align: center;
 
-					&.news-alert-time {
-						font-size: 0.12rem;
-						text-align: center;
+					span {
+						color: #999;
+						display: inline-block;
+						border-radius: 3px;
+						padding: 0rem 0.1rem;
+						height: 0.2rem;
+						line-height: 0.2rem;
+						color: #ffffff;
+						background-color: rgba(0, 0, 0, 0.2);
+					}
 
-						span {
-							color: #999;
-							display: inline-block;
-							border-radius: 3px;
-							padding: 0.01rem 0.16rem;
+					em {
+						font-style: normal;
+						color: #f44c5d;
+						margin-left: 0.05rem;
+					}
+
+					.icon-redpacket {
+						width: 0.13rem;
+						height: 0.15rem;
+						margin-top: 0.025rem;
+						display: block;
+						float: left;
+						margin-right: 0.05rem;
+					}
+
+				}
+
+				.marry-chat-content {
+					.flex {
+						display: block;
+					}
+
+					img.userphoto {
+						display: inline-block;
+						width: 0.36rem;
+						height: 0.36rem;
+						border-radius: 0.05rem;
+						vertical-align: middle;
+						margin-right: 0.12rem;
+					}
+
+					.nickname {
+						color: #999;
+						text-overflow: ellipsis;
+						overflow: hidden;
+						white-space: nowrap;
+						max-width: 200px;
+						display: block;
+					}
+
+					.msg-content {
+						margin-top: 0.06rem;
+						line-height: 1.4;
+						background-color: #fff;
+						border-radius: 0.05rem;
+						padding: 0.1rem;
+						position: relative;
+						margin-right: 0.5rem;
+						word-break: break-word;
+
+						&:before {
+							background: url(/static/img/qipao.png) left top no-repeat;
+							content: "";
+							position: absolute;
+							top: 0.05rem;
+							left: -0.04rem;
+							width: 0.04rem;
+							height: 0.06rem;
+							background-size: 0.04rem 0.06rem;
+						}
+
+						.chat-msg-img {
+							width: 200px;
+							vertical-align: top;
+							z-index: 2;
+							display: block;
 						}
 
 					}
 
-					&.recive-redpacket {
-						font-size: 0.12rem;
-						text-align: center;
+					.content-redpacket {
+						margin-top: 0.06rem;
+						position: relative;
+						border-radius: 0.04rem;
+						min-width: 1.9rem;
 
-						span {
-							color: #999;
-							display: inline-block;
-							border-radius: 3px;
-							padding: 0rem 0.1rem;
+						&:before {
+							background: url(/static/img/qipao2.png) left top no-repeat;
+							content: "";
+							position: absolute;
+							top: 0.05rem;
+							left: -0.04rem;
+							width: 0.04rem;
+							height: 0.06rem;
+							display: block;
+							background-size: 0.04rem 0.06rem;
+						}
+
+						.rpna-ul {
+							color: #fff;
+							background: #fa9d3b;
+							padding: 0.1rem;
+							border-radius: 5px;
+							border: 1px solid #e28f3b;
+							position: relative;
+							min-width: 1.7rem;
+						}
+
+						.hongbao {
+							border-bottom-left-radius: 0;
+							border-bottom-right-radius: 0;
+
+							.rpna-pic {
+								width: 0.33rem;
+								height: 0.39rem;
+								overflow: hidden;
+
+								img {
+									width: 100%;
+								}
+
+							}
+
+							.flex {
+								-webkit-box-flex: 1;
+								-webkit-flex: 1;
+								-ms-flex: 1;
+								flex: 1;
+								cursor: pointer;
+								padding-left: 0.1rem;
+								line-height: 1.5;
+
+								.rena-wish {
+									font-size: 0.15rem;
+									overflow: hidden;
+									text-overflow: ellipsis;
+									white-space: normal;
+								}
+
+								.rena-get {
+									font-size: 0.12rem;
+								}
+
+							}
+
+						}
+
+						.white-top {
+							background: #fff;
 							height: 0.2rem;
 							line-height: 0.2rem;
-							color: #ffffff;
-							background-color: rgba(0, 0, 0, 0.2);
-						}
-
-						em {
-							font-style: normal;
-							color: #f44c5d;
-							margin-left: 0.05rem;
-						}
-
-						.icon-redpacket {
-							width: 0.13rem;
-							height: 0.15rem;
-							margin-top: 0.025rem;
-							display: block;
-							float: left;
-							margin-right: 0.05rem;
-						}
-
-					}
-
-					.marry-chat-content {
-						.flex {
-							display: block;
-						}
-
-						img.userphoto {
-							display: inline-block;
-							width: 0.36rem;
-							height: 0.36rem;
-							border-radius: 0.05rem;
-							vertical-align: middle;
-							margin-right: 0.12rem;
-						}
-
-						.nickname {
-							color: #999;
-							text-overflow: ellipsis;
-							overflow: hidden;
-							white-space: nowrap;
-							max-width: 200px;
-							display: block;
-						}
-
-						.msg-content {
-							margin-top: 0.06rem;
-							line-height: 1.4;
-							background-color: #fff;
-							border-radius: 0.05rem;
-							padding: 0.1rem;
-							position: relative;
-							margin-right: 0.5rem;
-							word-break: break-word;
-
-							&:before {
-								background: url(/static/img/qipao.png) left top no-repeat;
-								content: "";
-								position: absolute;
-								top: 0.05rem;
-								left: -0.04rem;
-								width: 0.04rem;
-								height: 0.06rem;
-								background-size: 0.04rem 0.06rem;
-							}
-
-							.chat-msg-img {
-								max-width: 200px;
-								max-height: 200px;
-								vertical-align: top;
-								z-index: 2;
-							}
-
-						}
-
-						.content-redpacket {
-							margin-top: 0.06rem;
-							position: relative;
-							border-radius: 0.04rem;
-							min-width: 1.9rem;
-
-							&:before {
-								background: url(/static/img/qipao2.png) left top no-repeat;
-								content: "";
-								position: absolute;
-								top: 0.05rem;
-								left: -0.04rem;
-								width: 0.04rem;
-								height: 0.06rem;
-								display: block;
-								background-size: 0.04rem 0.06rem;
-							}
-
-							.rpna-ul {
-								color: #fff;
-								background: #fa9d3b;
-								padding: 0.1rem;
-								border-radius: 5px;
-								border: 1px solid #e28f3b;
-								position: relative;
-								min-width: 1.7rem;
-							}
-
-							.hongbao {
-								border-bottom-left-radius: 0;
-								border-bottom-right-radius: 0;
-
-								.rpna-pic {
-									width: 0.33rem;
-									height: 0.39rem;
-									overflow: hidden;
-
-									img {
-										width: 100%;
-									}
-
-								}
-
-								.flex {
-									-webkit-box-flex: 1;
-									-webkit-flex: 1;
-									-ms-flex: 1;
-									flex: 1;
-									cursor: pointer;
-									padding-left: 0.1rem;
-									line-height: 1.5;
-
-									.rena-wish {
-										font-size: 0.15rem;
-										overflow: hidden;
-										text-overflow: ellipsis;
-										white-space: normal;
-									}
-
-									.rena-get {
-										font-size: 0.12rem;
-									}
-
-								}
-
-							}
-
-							.white-top {
-								background: #fff;
-								height: 0.2rem;
-								line-height: 0.2rem;
-								padding: 0 0.1rem;
-								font-size: 0.11rem;
-								color: #ccc;
-								border-bottom-left-radius: 0.04rem;
-								border-bottom-right-radius: 0.04rem;
-							}
-
+							padding: 0 0.1rem;
+							font-size: 0.11rem;
+							color: #ccc;
+							border-bottom-left-radius: 0.04rem;
+							border-bottom-right-radius: 0.04rem;
 						}
 
 					}
@@ -670,6 +666,7 @@ ul, li {
 
 	.tab2 {
 		overflow-y: scroll;
+		-webkit-overflow-scrolling: touch;
 
 		h2 {
 			line-height: 0.35rem;
@@ -696,6 +693,7 @@ ul, li {
 
 	.tab3 {
 		overflow-y: scroll;
+		-webkit-overflow-scrolling: touch;
 
 		.tab3-title {
 			border: 1px solid #01b3e9;
@@ -793,6 +791,7 @@ ul, li {
 
 	.tab4 {
 		overflow-y: scroll;
+		-webkit-overflow-scrolling: touch;
 	}
 
 }
@@ -1419,9 +1418,10 @@ ul, li {
 }
 
 .toast-box {
-	.pop-mask{
+	.pop-mask {
 		z-index: 999999;
 	}
+
 	.toast-text {
 		position: fixed;
 		z-index: 9999999;
@@ -1440,7 +1440,7 @@ ul, li {
 		-ms-transform: translateX(-50%);
 		-moz-transform: translateX(-50%);
 		-webkit-transform: translateX(-50%);
-		-o-transform: translateX(-50%);		
+		-o-transform: translateX(-50%);
 	}
 
 }
