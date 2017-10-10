@@ -19,7 +19,7 @@ export default {
         }
     },
     created() {
-        document.title = '首页';
+        document.title = '邀请';
         this.loadData();
     },
     watch:{
