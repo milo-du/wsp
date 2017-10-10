@@ -76,8 +76,8 @@
         </div>
         <div class="slide-content">
             <swiper :options="contentSwiperOption" ref="contentSwiper" v-bind:class="{ notransform: tabData.index==0 }">
-                <swiper-slide class="tab1" ref="tab1" v-bind:style="{ height: scrollBoxHeight + 'px' }" v-scroll="onScroll" @click.prevent="handleClickChatBox()">                    
-                        <ul class="chat-msg-list">
+                <swiper-slide class="tab1" ref="tab1" v-bind:style="{ height: scrollBoxHeight + 'px' }" v-scroll="onScroll">                    
+                        <ul class="chat-msg-list"  @click.prevent="handleClickChatBox()">
                                 <li class="d-flex" v-if="loadingChat">
                                     <img src="/static/img/loading-chat.gif" class="loading-gif">
                                 </li>
@@ -538,23 +538,22 @@ export default {
         resetChatBox:function(){
             this.$nextTick(function() {               
                var bannerHeight = this.$refs.bannerSwiper && this.$refs.bannerSwiper.offsetHeight || 0,
-                   fixInputBarHeight = this.$refs.fixInputBar.offsetHeight,
+                   fixInputBarHeight = this.$refs.fixInputBar && this.$refs.fixInputBar.offsetHeight || 0,
                    tabBoxHeight = this.$refs.tabBox.offsetHeight,
                    videoBoxHeight = this.$refs.videoBox.offsetHeight,
                    h = bannerHeight + fixInputBarHeight + tabBoxHeight + videoBoxHeight,
                    clientHeight = window.screen.height,
                    chatBoxHeight = clientHeight - h;
-               this.scrollBoxHeight = chatBoxHeight;
-               this.scrollBoxHeight2 = chatBoxHeight + fixInputBarHeight;     
+               this.scrollBoxHeight2 = this.scrollBoxHeight = chatBoxHeight;
           });
         },
         reload:function(){
             window.location.reload();
         },
         handleInputClick:function(){            
-           // setTimeout(function(){
-           //   this.$refs.chatInput.scrollIntoViewIfNeeded();             
-           // }.bind(this),200);
+           setTimeout(function(){
+             this.$refs.chatInput.scrollIntoViewIfNeeded();             
+           }.bind(this),200);
         },
         handleShowReciveRedpacketList:function(redPacketId){
             var redPacketId = redPacketId || this.redPackInfo.id;            
@@ -1184,10 +1183,13 @@ export default {
                         switch (type) {
                             case 'firstLoad':
                                 {
-                                    this.commentList = res.data;                                    
-                                    this.$nextTick(function(){                                        
-                                       this.$refs.tab1.$el.scrollTop = this.$refs.tab1.$el.scrollHeight;
-                                    });           
+                                    this.commentList = res.data;
+                                    this.loadingChat = false;
+                                    setTimeout(function(){
+                                      this.$nextTick(function(){                                        
+                                        this.$refs.tab1.$el.scrollTop = this.$refs.tab1.$el.scrollHeight;
+                                      });           
+                                    }.bind(this),200);                                    
                                 }
                                 break;
                             case 'new':
