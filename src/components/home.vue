@@ -234,7 +234,7 @@
                     <li class="d-flex line vcenter">
                         <span class="totalmoney">
                             总金额
-                            <i><img src="/static/img/redpacketping.png"></i>
+                            <i v-if="sendRedPacketData.type!=1"><img src="/static/img/redpacketping.png"></i>
                         </span>
                         <input type="number" v-model="sendRedPacketData.money" placeholder="填写金额" class="flex inputbox" id="bagMoney" min="0">
                         <span>元</span>
@@ -338,7 +338,7 @@
                 <a href="javascript:void(0)" v-if="isSendEnd==0" class="open-redpack-btn" @click.prevent="handleOpenRedpacket">
                     <img src="/static/img/open.png"></a>
                 <img :src="redPackInfo.headImgUrl" @error="imageLoadError" class="user-photo">
-                <p class="p-title">suncz</p>
+                <p class="p-title">{{redPackInfo.nickName}}</p>
                 <template v-if="isSendEnd==0">
                     <p class="p-title2">发了一个红包，金额随机</p>
                     <p class="p-title3">恭喜发财，大吉大利！</p>
@@ -568,7 +568,7 @@ export default {
             }).then(function(res) {
                     res = res.data;
                     if (res.ret == 0) {
-                       this.reciveRedpacketData = res.data;
+                       this.reciveRedpacketData = res.data;                       
                     }
                     else{
                         this.showToast(res.msg);
@@ -639,7 +639,7 @@ export default {
                            else{
                              this.isSendEnd = res.data.isSendEnd;
                              this.showOpenRedPackBox = true;     
-                             this.redPackInfo = res.data.redPackInfo;
+                             this.redPackInfo = res.data.redPackInfo;                             
                            }
                        }
                     }
@@ -1225,7 +1225,7 @@ export default {
                 this.loadingChat = true;
                 setTimeout(()=>{
                    this.loadComment('old');
-                },1500);                
+                },500);                
             }
         }
     }
