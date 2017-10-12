@@ -334,7 +334,7 @@
                 <div class="flex input-box">
                     <span>金额(元)</span>
                     <input type="tel" placeholder="可填写2-100" v-model="rewardMoney"></div>
-                <a href="javascript:void(0)" class="btn-sure" @click.prevent="handleSubmitRewardOtherMoney">确定</a>
+                <a href="javascript:void(0)" class="btn-sure" @click.prevent="handleSubmitRewardOtherMoney()">确定</a>
             </div>
         </div>
         <div class="open-redpack-box" v-if="showOpenRedPackBox">
