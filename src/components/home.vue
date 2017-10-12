@@ -571,8 +571,7 @@ export default {
         },
         handleShowReciveRedpacketList:function(redPacketId){
             var redPacketId = redPacketId || this.redPackInfo.id;            
-            this.showOpenRedPackBox = false;
-            console.log(redPacketId);
+            this.showOpenRedPackBox = false;            
             this.request({                   
                 url: 'redPacket/redPacketDetail',
                 withToken: true,
@@ -674,29 +673,33 @@ export default {
           this.showRewardRedpacketBox = false;
           this.showRewardOtherMoneyBox = false;
         },
-        handleWeixinPay:function(redpacketId){
+        handleWeixinPay: function(redpacketId, type) {
             this.request({
                 type: 'post',
                 url: 'pay/wxHtml',
                 withToken: true,
                 data: {
-                    redPacketId:redpacketId
+                    redPacketId: redpacketId
                 }
             }).then(function(res) {
                     res = res.data;
-                    if (res.ret == 0) {         
-                      this.weixinPay({
-                        info:res.data,
-                        success:function(){
-                           this.loadComment('new');
-                        }.bind(this),
-                        error:function(err){
-                           this.showToast(JSON.stringify(err));
-                        }.bind(this)
-                      });                      
-                    }
-                    else{
-                        this.showToast(res.msg);                        
+                    if (res.ret == 0) {
+                        this.weixinPay({
+                            info: res.data,
+                            success: function() {
+                                if (type == 1) {
+                                    this.loadComment('new');
+                                } else {
+                                    this.showToast('打赏成功');
+                                    this.closeAllPop();
+                                }
+                            }.bind(this),
+                            error: function(err) {
+                                this.showToast(JSON.stringify(err));
+                            }.bind(this)
+                        });
+                    } else {
+                        this.showToast(res.msg);
                     }
                 }.bind(this),
                 function(err) {
@@ -729,7 +732,7 @@ export default {
                       var redpacketId = res.data.redpacketId;
                       this.sendRedPacketData.money  = '';
                       this.sendRedPacketData.num  = '';
-                      this.handleWeixinPay(redpacketId);
+                      this.handleWeixinPay(redpacketId,1);
                     }
                     else{
                         this.showSendRedBagErr(res.msg);
@@ -1037,9 +1040,9 @@ export default {
                 }
             }).then(function(res) {
                     res = res.data;
-                    if (res.ret == 0) {                        
-                        this.showToast('打赏成功');
-                        this.closeAllPop();
+                    if (res.ret == 0) {  
+                      var redpacketId = res.data.redpacketId;                      
+                      this.handleWeixinPay(redpacketId,2);                      
                     }
                     else{
                         this.showToast(res.msg);
