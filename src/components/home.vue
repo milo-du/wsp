@@ -715,13 +715,23 @@ export default {
                         this.weixinPay({
                             info: res.data,
                             success: function() {
-                                if (type == 1) {                                    
-                                    this.loadComment('new');
-                                    this.closeAllPop();
-                                } else {
-                                    this.showToast('打赏成功');
-                                    this.closeAllPop();
-                                }
+                                this.checkPayStatus(redpacketId).then(function(res) {
+                                    if (res.ret == 0) {
+                                        if (res.data.isPayed == 1) {
+                                            if (type == 1) {
+                                                this.loadComment('new');
+                                                this.closeAllPop();
+                                            } else {
+                                                this.showToast('打赏成功');
+                                                this.closeAllPop();
+                                            }
+                                        } else {
+                                            this.showToast('支付失败');
+                                        }
+                                    } else {
+                                        this.showToast(res.msg);
+                                    }
+                                }.bind(this));
                             }.bind(this),
                             error: function(err) {
                                 this.showToast(JSON.stringify(err));
@@ -734,6 +744,15 @@ export default {
                 function(err) {
                     this.showToast('服务器错误');
                 }.bind(this));
+        },
+        checkPayStatus:function(redPacketId){
+            return this.request({                
+                url: 'redPacket/ispayed',
+                withToken: true,
+                data:{
+                  redPacketId:redPacketId
+                }
+            });
         },
         weixinPay:function(options){
           var info = options.info;
