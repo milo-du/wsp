@@ -62,6 +62,10 @@
                         <a href="javascript:void(0)" class="inputicon photo" id="choose-img"></a>
                         <p>图片</p>
                     </li>
+                    <li>
+                        <a href="javascript:void(0)" class="inputicon drawal" @click.prevent="handleShowWithdrawalsMoneyBox"></a>
+                        <p>提现</p>
+                    </li>                    
                 </ul>
             </div>
         </div>
@@ -70,7 +74,7 @@
                 <!--优惠券-->
                 <div class="animation-shake youhuiquan"></div>
                 <!--打赏对象-->
-                <a class="icon-live-yaoqing" href="/share"></a>
+                <a class="icon-live-yaoqing" :href="'/share?id='+videoId+"'&fromUserId='+userInfo.uid"></a>
                 <a class="shangzhubo onlybtn icon-live-shang" @click.prevent="handleShowRewardRedpacket"></a>
             </div>
         </div>
@@ -337,6 +341,19 @@
                 <a href="javascript:void(0)" class="btn-sure" @click.prevent="handleSubmitRewardOtherMoney()">确定</a>
             </div>
         </div>
+        <div class="reward-other-money-box withdrawals-money-box" v-if="showWithdrawalsMoneyBox">
+            <div class="pop-mask" @click.prevent="handleHideWithdrawalsMoneyBox"></div>
+            <div class="popup">
+                <p class="p-title">提现金额</p>                
+                <div class="balance">
+                   您的余额：{{withdrawalsMaxMoney/100}}元
+                </div>
+                <div class="flex input-box">
+                    <span>金额(元)</span>
+                    <input type="tel" placeholder="填写金额不能大于余额’" v-model="withdrawalsMoney"></div>
+                <a href="javascript:void(0)" class="btn-sure" @click.prevent="handleSubmitWithdrawalsMoney()">确定</a>
+            </div>
+        </div>        
         <div class="open-redpack-box" v-if="showOpenRedPackBox">
             <div class="pop-mask"></div>
             <div class="popup">
@@ -479,11 +496,15 @@ export default {
             showReciveRedpacketList:false,
             reciveRedpacketData:{},
             loadingChat:true,
-            userInfo:{}
+            userInfo:{},
+            showWithdrawalsMoneyBox:false,
+            withdrawalsMoney:'',
+            withdrawalsMaxMoney:0,
+            withdrawalsMinMoney:0
         }
     },
     created() {
-        document.title = '首页';
+        document.title = '加载中...';
         this.loadData();
         this.resetChatBox();        
         window.addEventListener('resize', function() {     
@@ -534,6 +555,12 @@ export default {
         }
     },
     methods: {
+        handleShowWithdrawalsMoneyBox:function(){
+            this.showWithdrawalsMoneyBox = true;
+        },
+        handleHideWithdrawalsMoneyBox:function(){
+            this.closeAllPop();
+        },
         handlePrivewImg:function(img){ 
            wx.previewImage({
              current: img, // 当前显示图片的http链接
@@ -672,6 +699,7 @@ export default {
           this.showMoreBox = false;
           this.showRewardRedpacketBox = false;
           this.showRewardOtherMoneyBox = false;
+          this.showWithdrawalsMoneyBox = false;
         },
         handleWeixinPay: function(redpacketId, type) {
             this.request({
@@ -687,8 +715,9 @@ export default {
                         this.weixinPay({
                             info: res.data,
                             success: function() {
-                                if (type == 1) {
+                                if (type == 1) {                                    
                                     this.loadComment('new');
+                                    this.closeAllPop();
                                 } else {
                                     this.showToast('打赏成功');
                                     this.closeAllPop();
@@ -1029,6 +1058,50 @@ export default {
                this.showToast('请输入打赏金额');
             }
         },
+        handleSubmitWithdrawalsMoney:function(){
+            var money = Number(this.withdrawalsMoney)*100,
+                minMoney = this.withdrawalsMinMoney,
+                maxMoney = this.withdrawalsMaxMoney;
+            if(String(money).length>0)
+            {
+                if(money<minMoney)
+                {
+                    this.showToast('提现金额不能小于' + (minMoney /100)+'元');
+                    return;
+                }
+                if(money>maxMoney)
+                {
+                    this.showToast('提现金额不能大于'+ (maxMoney/100)+'元');
+                    return;
+                }                
+                this.postWithdrawalsPacket(money);
+            }
+           else{
+               this.showToast('请输入提现金额');
+            }
+        },     
+        postWithdrawalsPacket:function(money){
+            this.request({
+                type:'post',
+                url: 'account/withdrawalsApply',
+                withToken: true,
+                data: {                    
+                    money:money
+                }
+            }).then(function(res) {
+                    res = res.data;
+                    if (res.ret == 0) {  
+                       this.showToast(res.msg);
+                       this.closeAllPop();
+                    }
+                    else{
+                        this.showToast(res.msg);
+                    }                    
+                }.bind(this),
+                function(err) {
+                    this.showToast(err);
+                }.bind(this))             
+        },           
         postRedPacket:function(money){
             this.request({
                 type:'post',
@@ -1134,6 +1207,25 @@ export default {
             this.loadComment('firstLoad');
             this.loadRewardRank();
             this.loadInviteRank();
+            this.loadUserMoney();
+        },
+        loadUserMoney:function(){
+            this.request({                
+                url: 'account/userMoney',
+                withToken: true               
+            }).then(function(res) {
+                    res = res.data;
+                    if (res.ret == 0) {
+                        this.withdrawalsMaxMoney = res.data.money;
+                        this.withdrawalsMinMoney = res.data.limitWithdrawalsMoney;
+                    }
+                    else{
+                        this.showToast(res.msg);
+                    }                    
+                }.bind(this),
+                function(err) {
+                    this.showToast('服务器错误');
+                }.bind(this))            
         },
         loadRewardRank:function(){
             this.request({
@@ -1187,6 +1279,7 @@ export default {
                     if (res.ret == 0) {
                         this.vedioInfo = res.data.vedioInfo;
                         this.cooperation = res.data.cooperation;
+                        document.title = res.data.vedioInfo.name;
                         weixinUtils.wxInit(res.data.jsSign);
                     }
                     else{

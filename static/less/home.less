@@ -2,8 +2,7 @@ a {
 	text-decoration: none;
 }
 
-ul,
-li {
+ul, li {
 	margin: 0;
 	padding: 0;
 }
@@ -183,8 +182,7 @@ li {
 				bottom: 0px;
 				z-index: 5;
 
-				.heart,
-				.heart-large {
+				.heart, .heart-large {
 					position: absolute;
 					width: 30px;
 					opacity: 0;
@@ -884,6 +882,10 @@ li {
 		background-position: 0 -3.14rem;
 	}
 
+	&.drawal {
+		background-position: -3.88rem -3.14rem;
+	}
+
 }
 
 .sendredbagwin {
@@ -1019,8 +1021,7 @@ li {
 
 }
 
-.recive-redpacket-box,
-.reward-redpacket-box {
+.recive-redpacket-box, .reward-redpacket-box {
 	.popup {
 		position: fixed;
 		background: url(/static/img/recive-redpacket-bg.png) no-repeat top center;
@@ -1272,7 +1273,6 @@ li {
 
 	.popup {
 		width: 2.0rem;
-		height: 2.0rem;
 		position: fixed;
 		border-radius: 3px;
 		background-color: #fff;
@@ -1282,6 +1282,12 @@ li {
 		margin-left: -1rem;
 		margin-top: -1rem;
 		border-radius: 0.1rem;
+
+		.balance {
+			text-align: center;
+			font-size: 0.15rem;
+			margin-top: 0.15rem;
+		}
 
 		.p-title {
 			text-align: center;
@@ -1295,7 +1301,7 @@ li {
 			height: 0.375rem;
 			line-height: 0.375rem;
 			border: 1px solid #e5e5e5;
-			margin: 0.3rem 0.2rem;
+			margin: 0.2rem 0.2rem;
 
 			span {
 				width: 1rem;
@@ -1321,6 +1327,14 @@ li {
 			background-color: #4ca9f9;
 		}
 
+	}
+
+}
+
+.withdrawals-money-box {
+	.popup {
+		width: 3.0rem;
+		margin-left: -1.5rem;
 	}
 
 }
