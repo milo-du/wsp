@@ -125,10 +125,16 @@
                                 <li class="news-alert-time" v-if="item.type==10">
                                     <span>{{item.content}}</span>
                                 </li>
-                                <li class="recive-redpacket" v-if="item.type==4">
+                                <li class="recive-redpacket" v-if="item.type==4 && (userInfo.uid == item.redPacketUserId || userInfo.uid == item.userId)">
                                     <span>
                                         <img class="icon-redpacket" src="/static/img/hongbao_ico.png" />
-                                        你领取了{{item.redPacketUserNickName}}发的一个 <em @click.prevent="handleShowReciveRedpacketList(item.redPacketId)">红包</em>
+                                        <template v-if="userInfo.uid == item.redPacketUserId">
+                                          {{item.userNickName}}领取了您发的一个
+                                        </template>
+                                        <template v-else-if="userInfo.uid == item.userId">
+                                            您领取了{{item.redPacketUserNickName}}发的一个
+                                        </template>                                    
+                                        <em @click.prevent="handleShowReciveRedpacketList(item.redPacketId)">红包</em>
                                     </span>
                                 </li>
                             </template>
@@ -360,6 +366,7 @@
 </template>
 <script>
 import { swiper, swiperSlide } from 'vue-awesome-swiper';
+import weixinUtils from "../weixinUtils.js";
 import qqfaceJson from "../qqfaceJson.js";
 export default {
     name: 'home',
@@ -471,7 +478,8 @@ export default {
             rewardMoney:'',
             showReciveRedpacketList:false,
             reciveRedpacketData:{},
-            loadingChat:true
+            loadingChat:true,
+            userInfo:{}
         }
     },
     created() {
@@ -753,6 +761,7 @@ export default {
                 token:this.getParam('token')
              }
              // var userInfo = window.localStorage.getItem('USER_INFO') || {uid:4,token:'6b66a23682144c04dd60d02ed87645db'};
+             this.userInfo = userInfo;
              return userInfo;
         },
         jumpLogin:function(){
@@ -874,8 +883,8 @@ export default {
            var imgList = qqfaceJson.imgList,
              newContent = content;
            for (var i = 0; i < imgList.length; i++) {
-            newContent = newContent.replace(imgList[i].key,"<img src='"+imgList[i].value+"' class='qq-face-gif' />");
-          }            
+            newContent = newContent.replace(new RegExp(imgList[i].key,"g"),"<img src='"+imgList[i].value+"' class='qq-face-gif' />");
+          }
           return newContent;
         },
         imageLoadError: function(e) {
@@ -1131,6 +1140,7 @@ export default {
                     if (res.ret == 0) {
                         this.vedioInfo = res.data.vedioInfo;
                         this.cooperation = res.data.cooperation;
+                        weixinUtils.wxInit(res.data.jsSign);
                     }
                     else{
                         this.showToast(res.msg);
