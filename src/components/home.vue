@@ -88,7 +88,7 @@
                                         <div class="flex">
                                             <span class="nickname">{{item.userNickName}}</span>
                                             <div class="msg-content">
-                                                <img :src="item.pic" class="chat-msg-img"></div>
+                                                <img :src="item.pic" class="chat-msg-img" @click.prevent="handlePrivewImg(item.pic)"></div>
                                         </div>
                                     </div>
                                 </li>
@@ -534,6 +534,12 @@ export default {
         }
     },
     methods: {
+        handlePrivewImg:function(img){ 
+           wx.previewImage({
+             current: img, // 当前显示图片的http链接
+             urls: [img] // 需要预览的图片http链接列表
+           });
+        },
         showToast: function(txt) {
             this.toastTxt = txt;
             if (this.toastTid != null) {

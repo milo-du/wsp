@@ -2,16 +2,16 @@
  * @Author: Milodu
  * @Date:   2017-10-12 11:08:52
  * @Last Modified by:   Milodu
- * @Last Modified time: 2017-10-12 11:14:13
+ * @Last Modified time: 2017-10-12 15:37:24
  */
 require('jweixin');
 
 function wxConfig(appid, nonceStr, timestamp, signature, jsApiList) {
 	wx.config({
-		debug: true,
+		debug: false,
 		appId: appid,
-		timestamp: timestamp,
-		nonceStr: nonceStr,
+		timestamp: Number(timestamp),
+		nonceStr: String(nonceStr),
 		signature: signature,
 		jsApiList: jsApiList
 	});
