@@ -74,7 +74,7 @@
                 <!--优惠券-->
                 <div class="animation-shake youhuiquan"></div>
                 <!--打赏对象-->
-                <a class="icon-live-yaoqing" :href="'/share?id='+videoId+"'&fromUserId='+userInfo.uid"></a>
+                <a class="icon-live-yaoqing" href="/share"></a>
                 <a class="shangzhubo onlybtn icon-live-shang" @click.prevent="handleShowRewardRedpacket"></a>
             </div>
         </div>
