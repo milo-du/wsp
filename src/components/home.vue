@@ -674,6 +674,47 @@ export default {
           this.showRewardRedpacketBox = false;
           this.showRewardOtherMoneyBox = false;
         },
+        handleWeixinPay:function(redpacketId){
+            this.request({
+                type: 'post',
+                url: 'pay/wxHtml',
+                withToken: true,
+                data: {
+                    redPacketId:redpacketId
+                }
+            }).then(function(res) {
+                    res = res.data;
+                    if (res.ret == 0) {         
+                      this.weixinPay({
+                        info:res.data,
+                        success:function(){
+                           this.loadComment('new');
+                        }.bind(this),
+                        error:function(err){
+                           this.showToast(JSON.stringify(err));
+                        }.bind(this)
+                      });                      
+                    }
+                    else{
+                        this.showToast(res.msg);                        
+                    }
+                }.bind(this),
+                function(err) {
+                    this.showToast('服务器错误');
+                }.bind(this));
+        },
+        weixinPay:function(options){
+          var info = options.info;
+          wx.chooseWXPay({
+              timestamp: String(info.timeStamp),
+              nonceStr: String(info.nonceStr),
+              package: String(info.package),
+              signType: 'MD5',
+              paySign: String(info.paySign),
+              success: options.success,
+              fail: options.error
+          });            
+        },      
         handleSendRedPacket:function(){
             this.sendRedPacketData.videoId=this.videoId;
             this.sendRedPacketData.money = this.sendRedPacketData.money * 100;
@@ -688,7 +729,7 @@ export default {
                       var redpacketId = res.data.redpacketId;
                       this.sendRedPacketData.money  = '';
                       this.sendRedPacketData.num  = '';
-                      this.loadComment('new');
+                      this.handleWeixinPay(redpacketId);
                     }
                     else{
                         this.showSendRedBagErr(res.msg);
@@ -696,7 +737,7 @@ export default {
                 }.bind(this),
                 function(err) {
                     this.showToast('服务器错误');
-                }.bind(this))                   
+                }.bind(this));        
         },
         handleChangeRedpackType:function(){
             this.sendRedPacketData.type = this.sendRedPacketData.type==1?2:1;
@@ -931,10 +972,7 @@ export default {
                 function(err) {
                     this.showToast('服务器错误');
                 }.bind(this))
-        },
-        handleCloseReciveRedpacketBox:function(){
-
-        },
+        },       
         handleCloseRedBagBox:function(){
             this.showRedBagBox = false;
         },
