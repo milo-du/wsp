@@ -144,7 +144,7 @@
                                 <li class="recive-redpacket reward" v-if="item.type==5">
                                     <span>
                                         <img class="icon-redpacket" src="/static/img/hongbao_ico.png" />
-                                        {{item.userNickName}}赞赏了{{platformName}}一个<em>红包</em>
+                                        {{item.userNickName}}赞赏了{{platformName}}一个<em>{{item.redPacketMoney}}元红包</em>
                                     </span>
                                 </li>                                                               
                             </template>
@@ -1448,8 +1448,8 @@ export default {
                     this.showToast('服务器错误');                    
                 }.bind(this))
         },
-        onScroll:function(e, position){
-            if(position.scrollTop==0){
+        onScroll:function(e, position){            
+            if(position.scrollTop < 50 && !this.loadingChat){                  
                 this.loadingChat = true;
                 setTimeout(()=>{
                    this.loadComment('old');
