@@ -293,7 +293,7 @@
                 <img src="/static/img/defaultuser.jpg" class="user-photo">
                 <a href="javascript:void(0)" class="close-redpack-btn" @click.prevent="handleHideRewardRedpacket"></a>
                 <div class="content-info">
-                    <p class="nickname">小彩旗</p>
+                    <p class="nickname">御道文化传媒</p>
                     <p class="p2">爱赞赏的人，运气不会太差~</p>
                     <ul class="flex money-select-list">
                         <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(2)">
@@ -702,6 +702,7 @@ export default {
           this.showWithdrawalsMoneyBox = false;
         },
         handleWeixinPay: function(redpacketId, type) {
+            this.showLoading = true;
             this.request({
                 type: 'post',
                 url: 'pay/wxHtml',
@@ -715,29 +716,34 @@ export default {
                         this.weixinPay({
                             info: res.data,
                             success: function() {
-                                this.checkPayStatus(redpacketId).then(function(res) {
+                                this.checkPayStatus(redpacketId).then(function(res) {                                    
                                     if (res.ret == 0) {
                                         if (res.data.isPayed == 1) {
                                             if (type == 1) {
                                                 this.loadComment('new');
-                                                this.closeAllPop();
+                                                this.closeAllPop();                                           
                                             } else {
                                                 this.showToast('打赏成功');
                                                 this.closeAllPop();
-                                            }
+                                            }                                           
                                         } else {
                                             this.showToast('支付失败');
                                         }
                                     } else {
                                         this.showToast(res.msg);
                                     }
+                                    this.$nextTick(function() {
+                                        this.showLoading = false;
+                                    }.bind(this));                                      
                                 }.bind(this));
                             }.bind(this),
                             error: function(err) {
+                                this.showLoading = false;
                                 this.showToast(JSON.stringify(err));
                             }.bind(this)
                         });
                     } else {
+                        this.this.showLoading = false;
                         this.showToast(res.msg);
                     }
                 }.bind(this),
