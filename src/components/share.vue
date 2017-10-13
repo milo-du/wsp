@@ -105,11 +105,8 @@ export default {
             }).then(function(res) {
                     res = res.data;
                     if (res.ret == 0) {
-
-                    }
-                    else{
-                        
-                    }
+                      weixinUtils.wxInit(res.data.jsSign);
+                    }                 
                 }.bind(this),
                 function(err) {
                     this.showToast('服务器错误');
