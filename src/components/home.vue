@@ -84,7 +84,7 @@
                         <ul class="chat-msg-list"  @click.prevent="handleClickChatBox()">
                                 <li class="d-flex" v-if="loadingChat">
                                     <img src="/static/img/loading-chat.gif" class="loading-gif">
-                                </li>
+                                </li>                                                                                     
                             <template v-for="item in commentList">
                                 <li class="d-flex" v-if="item.type==2">
                                     <div class="marry-chat-content clearfix d-flex">
@@ -144,7 +144,7 @@
                                 <li class="recive-redpacket reward" v-if="item.type==5">
                                     <span>
                                         <img class="icon-redpacket" src="/static/img/hongbao_ico.png" />
-                                        {{item.userNickName}}赞赏了{{platformName}}一个<em>{{item.redPacketMoney}}元红包</em>
+                                        {{item.userNickName}}赞赏了{{platformName}}一个<em>{{item.redPacketMoney/100}}元红包</em>
                                     </span>
                                 </li>                                                               
                             </template>
@@ -509,7 +509,8 @@ export default {
             withdrawalsMoney:'',
             withdrawalsMaxMoney:0,
             withdrawalsMinMoney:0,
-            chatImgList:[]
+            chatImgList:[],
+            preScrollHeight:0
         }
     },
     created() {
@@ -720,7 +721,7 @@ export default {
           this.showWithdrawalsMoneyBox = false;
           this.showLoading = false;
         },
-        handleWeixinPay: function(redpacketId, type) {
+        handleWeixinPay: function(redpacketId) {
             this.showLoading = true;
             this.request({
                 type: 'post',
@@ -737,14 +738,9 @@ export default {
                             success: function() {
                                 this.checkPayStatus(redpacketId).then(function(res) {                                    
                                     if (res.ret == 0) {
-                                        if (res.data.isPayed == 1) {
-                                            if (type == 1) {
-                                                this.loadComment('new');
-                                                this.closeAllPop();                                        
-                                            } else {
-                                                this.showToast('打赏成功');
-                                                this.closeAllPop();
-                                            }                                           
+                                        if (res.data.isPayed == 1) {                                         
+                                            this.loadComment('new');
+                                            this.closeAllPop();                   
                                         } else {
                                             this.showToast('支付失败');
                                         }
@@ -802,7 +798,7 @@ export default {
                       var redpacketId = res.data.redpacketId;
                       this.sendRedPacketData.money  = '';
                       this.sendRedPacketData.num  = '';
-                      this.handleWeixinPay(redpacketId,1);
+                      this.handleWeixinPay(redpacketId);
                     }
                     else{
                         this.showSendRedBagErr(res.msg);
@@ -1152,7 +1148,7 @@ export default {
                     res = res.data;
                     if (res.ret == 0) {  
                       var redpacketId = res.data.redpacketId;                      
-                      this.handleWeixinPay(redpacketId,2);                      
+                      this.handleWeixinPay(redpacketId);                      
                     }
                     else{
                         this.showToast(res.msg);
@@ -1425,7 +1421,7 @@ export default {
                                     this.commentList = this.commentList.concat(res.data);
                                     this.$nextTick(function(){
                                        this.$refs.tab1.$el.scrollTop = this.$refs.tab1.$el.scrollHeight;
-                                    });              
+                                    });    
                                     this.closeAllPop();                                  
                                   }
                                 }
@@ -1433,7 +1429,10 @@ export default {
                             case 'old':
                                 {
                                     this.commentList = res.data.concat(this.commentList);
-                                    this.loadingChat = false;
+                                    this.loadingChat = false;                                    
+                                    this.$nextTick(function(){
+                                       this.$refs.tab1.$el.scrollTop = this.$refs.tab1.$el.scrollHeight - this.preScrollHeight;
+                                    });
                                 }
                                 break;
                         }                        
@@ -1446,9 +1445,10 @@ export default {
                     this.showToast('服务器错误');                    
                 }.bind(this))
         },
-        onScroll:function(e, position){            
-            if(position.scrollTop < 50 && !this.loadingChat){                  
+        onScroll:function(e, position){                   
+            if(position.scrollTop == 0 ){                  
                 this.loadingChat = true;
+                this.preScrollHeight = this.$refs.tab1.$el.scrollHeight;
                 setTimeout(()=>{
                    this.loadComment('old');
                 },500);                
