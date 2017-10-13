@@ -514,8 +514,8 @@ export default {
     },
     created() {
         document.title = '加载中...';
-        this.loadData();
         this.initUserInfo();
+        this.loadData();        
         this.resetChatBox();        
         window.addEventListener('resize', function() {     
           this.resetChatBox();
