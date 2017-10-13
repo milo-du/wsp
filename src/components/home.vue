@@ -718,6 +718,7 @@ export default {
           this.showRewardRedpacketBox = false;
           this.showRewardOtherMoneyBox = false;
           this.showWithdrawalsMoneyBox = false;
+          this.showLoading = false;
         },
         handleWeixinPay: function(redpacketId, type) {
             this.showLoading = true;
@@ -749,12 +750,7 @@ export default {
                                         }
                                     } else {
                                         this.showToast(res.msg);
-                                    }
-                                    this.$nextTick(function() {
-                                        alert('gg');
-                                        this.showLoading = false;
-                                    }.bind(this));  
-                                    alert('zz');                                    
+                                    }                                    
                                 }.bind(this));
                             }.bind(this),
                             error: function(err) {
