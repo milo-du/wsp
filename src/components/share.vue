@@ -3,12 +3,17 @@
        <dl class="topic_share_card_text">
             <dt>如何玩转邀请卡</dt>
             <dd>1.公开话题/加密话题邀请好友来看直播,榜上有名;</dd>
-            <dd>2.长按保存图片或点击右上角"..."发送给好友即可邀请;</dd>
-            <dd>3.点击"更换邀请卡主题",切换邀请卡主题样式。</dd>
+            <dd>2.长按保存图片或点击右上角"..."发送给好友即可邀请;</dd>           
         </dl>
-    </div>
+        <img :src="qrImg" class="qrcode-img">
+        <div class="toast-box" v-if="toastTxt.length>0">
+            <div class="pop-mask"></div>
+            <span class="toast-text">{{toastTxt}}</span>
+        </div>        
+    </div>    
 </template>
 <script>
+import weixinUtils from "../weixinUtils.js";
 export default {
     name: 'share',
     components: {
@@ -16,6 +21,8 @@ export default {
     },
     data() {
         return {
+            toastTxt:'',
+            qrImg:''
         }
     },
     created() {
@@ -23,6 +30,7 @@ export default {
         this.loadData();
     },
     watch:{
+
     },
     methods: {
         showToast: function(txt) {
@@ -39,30 +47,25 @@ export default {
             window.location.reload();
         },
         loadData:function(){
-
-        }, 
-        handleOpenRedpack:function(redPacketId){            
             this.request({                
-                url: 'redPacket/redPacketReceivePage',
-                withToken: true,
+                url: 'video/inviteInfo',                
                 data: {
-                    redPacketId: redPacketId
+                    videoId: this.getParam('id'),
+                    fromUserId:this.getParam('fromUserId')
                 }
             }).then(function(res) {
                     res = res.data;
                     if (res.ret == 0) {
-                       if(res.data.isExpired==1){
-                         this.showToast('红包已超过24小时,不能查看！');
-                       }else{
-                           if(res.data.isReceived==1){
-                              this.handleShowReciveRedpacketList(redPacketId);
-                           }
-                           else{
-                             this.isSendEnd = res.data.isSendEnd;
-                             this.showOpenRedPackBox = true;     
-                             this.redPackInfo = res.data.redPackInfo;
-                           }
-                       }
+                        var userInfo = this.getUserInfo();
+                        var videoInfo = res.data.videoInfo;                        
+                        this.qrImg = `${CONFIG.DOMAIN.API}/tool/qrCode?uid=${userInfo.uid}&token=${userInfo.token}&data=${res.data.qrCodeUrl}`;
+                          
+                        this.bindWeixinShare({
+                          title: videoInfo.shareTitle,
+                          desc: videoInfo.shareContent,
+                          link:res.data.qrCodeUrl,
+                          imgUrl: videoInfo.shareIcon
+                        });                        
                     }
                     else{
                         this.showToast(res.msg);
@@ -70,8 +73,57 @@ export default {
                 }.bind(this),
                 function(err) {
                     this.showToast('服务器错误');
-                }.bind(this))            
+                }.bind(this))           
         },
+        bindWeixinShare: function(opts) {
+          wx.ready(function() {
+             var list = [
+                 'onMenuShareTimeline',
+                 'onMenuShareAppMessage',
+                 'onMenuShareQQ',
+                 'onMenuShareWeibo',
+                 'onMenuShareQZone'
+             ];
+             for (var i = 0, len = list.length; i < len; i++) {
+                wx[list[i]]({
+                    title: opts.title,
+                    desc: opts.desc,
+                    link: opts.link,
+                    imgUrl: opts.imgUrl,
+                    type: 'link'
+                });
+              }
+            });
+           this.initWeixinConfig();
+        }, 
+        initWeixinConfig:function(){
+            this.request({                
+                url: 'video/getJsApi',
+                data: {
+                    jsApiUrl: encodeURIComponent(location.href.split('#')[0])                    
+                }
+            }).then(function(res) {
+                    res = res.data;
+                    if (res.ret == 0) {
+
+                    }
+                    else{
+                        
+                    }
+                }.bind(this),
+                function(err) {
+                    this.showToast('服务器错误');
+                }.bind(this))             
+        },       
+        showToast: function(txt) {
+            this.toastTxt = txt;
+            if (this.toastTid != null) {
+                clearTimeout(this.toastTid);
+            }
+            this.toastTid = setTimeout(() => {
+                this.toastTxt = '';
+            }, 2000);
+        },        
         ajax: function(options) {
             options = options || {};
             var url = String(options.url).indexOf('http') === 0 ? options.url : CONFIG.DOMAIN.API + options.url;
@@ -132,12 +184,9 @@ export default {
               o = i.exec(t || location.href);
            return o ? decodeURIComponent(o[1]) : '';            
         },
-        getUserInfo:function(){
-             var userInfo = {
-                uid:this.getParam('uid'),
-                token:this.getParam('token')
-             }
-             // var userInfo = window.localStorage.getItem('USER_INFO') || {uid:4,token:'6b66a23682144c04dd60d02ed87645db'};
+        getUserInfo:function(){             
+             var userInfo = window.localStorage.getItem('USER_INFO') || {};
+             userInfo = JSON.parse(userInfo);             
              return userInfo;
         },
         jumpLogin:function(){

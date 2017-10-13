@@ -12,7 +12,6 @@ import plupload from 'plupload';
 import dateFormat from "dateformat";
 import utils from "./utils.js";
 import CONFIG from "./config.js";
-require('swiper/dist/css/swiper.css');
 
 utils.refreshRem();
 window.moxie = plupload.moxie;

@@ -2,7 +2,7 @@
 	color: #333;
 	margin: 0 0.15rem;
 	padding: 0.2rem 0;
-
+	text-align: left;
 	dt {
 		font-size: 0.15rem;
 		margin-bottom: 0.15rem;
@@ -13,4 +13,34 @@
 		margin-bottom: 0.1rem;
 	}
 
+}
+
+.toast-box {
+	.pop-mask {
+		z-index: 999999;
+	}
+
+	.toast-text {
+		position: fixed;
+		z-index: 9999999;
+		color: white;
+		top: 50%;
+		left: 50%;
+		padding: 0.05rem 0.1rem;
+		border-radius: 0.05rem;
+		background-color: rgba(0, 0, 0, 0.8);
+		transform: translateY(-50%);
+		-ms-transform: translateY(-50%);
+		-moz-transform: translateY(-50%);
+		-webkit-transform: translateY(-50%);
+		-o-transform: translateY(-50%);
+		transform: translateX(-50%);
+		-ms-transform: translateX(-50%);
+		-moz-transform: translateX(-50%);
+		-webkit-transform: translateX(-50%);
+		-o-transform: translateX(-50%);
+	}
+}
+.container{
+	text-align: center;
 }

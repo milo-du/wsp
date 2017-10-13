@@ -74,7 +74,7 @@
                 <!--优惠券-->
                 <div class="animation-shake youhuiquan"></div>
                 <!--打赏对象-->
-                <a class="icon-live-yaoqing" href="/share"></a>
+                <a class="icon-live-yaoqing" :href="'/share?id='+videoId+'&fromUserId='+userInfo.uid"></a>
                 <a class="shangzhubo onlybtn icon-live-shang" @click.prevent="handleShowRewardRedpacket"></a>
             </div>
         </div>
@@ -138,9 +138,15 @@
                                         <template v-else-if="userInfo.uid == item.userId">
                                             您领取了{{item.redPacketUserNickName}}发的一个
                                         </template>                                    
-                                        <em @click.prevent="handleShowReciveRedpacketList(item.redPacketId)">红包</em>
+                                        <em @click.prevent="handleShowReciveRedpacketList(item.redPacketId)">{{item.getRedPacketMoney}}元红包</em>
                                     </span>
-                                </li>
+                                </li>  
+                                <li class="recive-redpacket reward" v-if="item.type==5">
+                                    <span>
+                                        <img class="icon-redpacket" src="/static/img/hongbao_ico.png" />
+                                        {{item.userNickName}}赞赏了{{platformName}}一个<em>红包</em>
+                                    </span>
+                                </li>                                                               
                             </template>
                         </ul>                    
                 </swiper-slide>
@@ -257,7 +263,7 @@
             </div>
         </div>
         <div class="recive-redpacket-box" v-if="showReciveRedpacketList">
-            <div class="pop-mask" @click.prevent="handleHideReciveRedpacketList"></div>
+            <div class="pop-mask" @click.prevent="handleHideReciveRedpacketList"></div>+-
             <div class="popup">
                 <img :src="reciveRedpacketData.redPackInfo && reciveRedpacketData.redPackInfo.headImgUrl" @error="imageLoadError" class="user-photo">
                 <a href="javascript:void(0)" class="close-redpack-btn" @click.prevent="handleHideReciveRedpacketList"></a>
@@ -266,7 +272,7 @@
                         {{reciveRedpacketData.redPackInfo && reciveRedpacketData.redPackInfo.nickName}}的红包
                         <em v-if="reciveRedpacketData.redPackInfo && reciveRedpacketData.redPackInfo.type=='2'">拼</em>
                     </p>
-                    <p class="money">{{reciveRedpacketData.userReceiveMoney}}元</p>
+                    <p class="money">{{reciveRedpacketData.redPackInfo && (Number(reciveRedpacketData.redPackInfo.money)/100)}}元</p>
                     <div class="readpacket-title">{{reciveRedpacketData.displayWord}}</div>
                     <ul class="user-list">
                         <li class="flex user-item" v-for="item in reciveRedpacketData.redPacketLogList">
@@ -293,7 +299,7 @@
                 <img src="/static/img/defaultuser.jpg" class="user-photo">
                 <a href="javascript:void(0)" class="close-redpack-btn" @click.prevent="handleHideRewardRedpacket"></a>
                 <div class="content-info">
-                    <p class="nickname">御道文化传媒</p>
+                    <p class="nickname">{{platformName}}</p>
                     <p class="p2">爱赞赏的人，运气不会太差~</p>
                     <ul class="flex money-select-list">
                         <li class="item-select-money" @click.prevent="handleSubmitRewardOtherMoney(2)">
@@ -385,6 +391,7 @@
 import { swiper, swiperSlide } from 'vue-awesome-swiper';
 import weixinUtils from "../weixinUtils.js";
 import qqfaceJson from "../qqfaceJson.js";
+require('swiper/dist/css/swiper.css');
 export default {
     name: 'home',
     components: {
@@ -393,6 +400,7 @@ export default {
     },
     data() {
         return {
+            platformName:'御道文化传媒',
             toastTid:null,
             toastTxt:'',
             showOpenRedPackBox:false,
@@ -500,19 +508,21 @@ export default {
             showWithdrawalsMoneyBox:false,
             withdrawalsMoney:'',
             withdrawalsMaxMoney:0,
-            withdrawalsMinMoney:0
+            withdrawalsMinMoney:0,
+            chatImgList:[]
         }
     },
     created() {
         document.title = '加载中...';
         this.loadData();
+        this.initUserInfo();
         this.resetChatBox();        
         window.addEventListener('resize', function() {     
           this.resetChatBox();
         }.bind(this), false);
         setInterval(()=>{
             this.loadComment('new');
-        },3000);        
+        },3000);      
     },
     watch:{
         'cmtInput': function(c, o) {
@@ -555,6 +565,14 @@ export default {
         }
     },
     methods: {
+        initUserInfo:function(){
+          var userInfo = {
+             uid:this.getParam('uid'),
+             token:this.getParam('token')
+           };
+           this.userInfo = userInfo;
+           window.localStorage.setItem('USER_INFO',JSON.stringify(userInfo));
+        },        
         handleShowWithdrawalsMoneyBox:function(){
             this.showWithdrawalsMoneyBox = true;
         },
@@ -564,7 +582,7 @@ export default {
         handlePrivewImg:function(img){ 
            wx.previewImage({
              current: img, // 当前显示图片的http链接
-             urls: [img] // 需要预览的图片http链接列表
+             urls: this.chatImgList // 需要预览的图片http链接列表
            });
         },
         showToast: function(txt) {
@@ -599,7 +617,7 @@ export default {
         handleShowReciveRedpacketList:function(redPacketId){
             var redPacketId = redPacketId || this.redPackInfo.id;            
             this.showOpenRedPackBox = false;            
-            this.request({                   
+            this.request({
                 url: 'redPacket/redPacketDetail',
                 withToken: true,
                 data: {
@@ -721,7 +739,7 @@ export default {
                                         if (res.data.isPayed == 1) {
                                             if (type == 1) {
                                                 this.loadComment('new');
-                                                this.closeAllPop();                                           
+                                                this.closeAllPop();                                        
                                             } else {
                                                 this.showToast('打赏成功');
                                                 this.closeAllPop();
@@ -857,15 +875,11 @@ export default {
         getParam:function(n, t){
            var i = new RegExp('(?:^|\\?|#|&)' + n + '=([^&#]*)(?:$|&|#)', 'i'),
               o = i.exec(t || location.href);
-           return o ? decodeURIComponent(o[1]) : '';            
+           return o ? decodeURIComponent(o[1]) : '';
         },
-        getUserInfo:function(){
-             var userInfo = {
-                uid:this.getParam('uid'),
-                token:this.getParam('token')
-             }
-             // var userInfo = window.localStorage.getItem('USER_INFO') || {uid:4,token:'6b66a23682144c04dd60d02ed87645db'};
-             this.userInfo = userInfo;
+        getUserInfo:function(){             
+             var userInfo = window.localStorage.getItem('USER_INFO') || {};
+             userInfo = JSON.parse(userInfo);             
              return userInfo;
         },
         jumpLogin:function(){
@@ -1272,6 +1286,26 @@ export default {
                     this.showToast('服务器错误');
                 }.bind(this))
         },
+        bindWeixinShare: function(opts) {
+          wx.ready(function() {
+             var list = [
+                 'onMenuShareTimeline',
+                 'onMenuShareAppMessage',
+                 'onMenuShareQQ',
+                 'onMenuShareWeibo',
+                 'onMenuShareQZone'
+             ];
+             for (var i = 0, len = list.length; i < len; i++) {
+                wx[list[i]]({
+                    title: opts.title,
+                    desc: opts.desc,
+                    link: opts.link,
+                    imgUrl: opts.imgUrl,
+                    type: 'link'
+                });
+              }
+            });           
+        },         
         loadInviteRank:function(){
             this.request({
                 url: 'video/getInviteRank',
@@ -1306,6 +1340,13 @@ export default {
                         this.cooperation = res.data.cooperation;
                         document.title = res.data.vedioInfo.name;
                         weixinUtils.wxInit(res.data.jsSign);
+
+                        this.bindWeixinShare({
+                          title: this.vedioInfo.shareTitle,
+                          desc: this.vedioInfo.shareContent,
+                          link: this.vedioInfo.shareLink,
+                          imgUrl: this.vedioInfo.shareIcon
+                        });                          
                     }
                     else{
                         this.showToast(res.msg);
@@ -1314,6 +1355,17 @@ export default {
                 function(err) {
                     this.showToast('服务器错误');
                 })
+        },
+        filterImgList:function(data){                   
+           if(data && data.length>0)
+           {              
+              for(var i=0;i<data.length;i++)
+              {                
+                  if(data[i].type == 2){
+                     this.chatImgList.push(data[i].pic);
+                  }
+              }
+           }
         },
         loadComment(type) {       
             var formData = {
@@ -1352,9 +1404,10 @@ export default {
                 withToken: true,
                 data: formData
             }).then(function(res) {                    
-                    res = res.data;
-                    res.data = res.data.reverse();
+                    res = res.data;                    
                     if (res.ret == 0) {
+                        this.filterImgList(res.data);
+                        res.data = res.data.reverse();
                         switch (type) {
                             case 'firstLoad':
                                 {
@@ -1385,7 +1438,7 @@ export default {
                                     this.loadingChat = false;
                                 }
                                 break;
-                        }
+                        }                        
                     }
                     else{
                         this.showToast(res.msg);
