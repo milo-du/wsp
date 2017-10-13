@@ -751,8 +751,10 @@ export default {
                                         this.showToast(res.msg);
                                     }
                                     this.$nextTick(function() {
+                                        alert('gg');
                                         this.showLoading = false;
-                                    }.bind(this));                                      
+                                    }.bind(this));  
+                                    alert('zz');                                    
                                 }.bind(this));
                             }.bind(this),
                             error: function(err) {
