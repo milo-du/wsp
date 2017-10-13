@@ -613,7 +613,7 @@ export default {
         handleInputClick:function(){            
            setTimeout(function(){
              this.$refs.chatInput.scrollIntoViewIfNeeded();             
-           }.bind(this),200);
+           }.bind(this),400);
         },
         handleShowReciveRedpacketList:function(redPacketId){
             var redPacketId = redPacketId || this.redPackInfo.id;            
