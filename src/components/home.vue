@@ -1,7 +1,7 @@
 <template>
     <div class="container">
-        <swiper :options="swiperOption" v-if="false" ref="bannerSwiper">
-            <swiper-slide v-for="slide in swiperSlides" class="swiper-img-slide">
+        <swiper :options="swiperOption" v-if="bannerList && bannerList.length>0" ref="bannerSwiper">
+            <swiper-slide v-for="slide in bannerList" class="swiper-img-slide">
                 <img :src="slide"></swiper-slide>
             <div class="swiper-pagination" slot="pagination"></div>
         </swiper>
@@ -31,7 +31,10 @@
                     <a href="javascript:void(0)" @click.prevent="handleClickNav(index)" class="on" v-if="item.key==tabData.index">{{item.value}}</a>
                     <a href="javascript:void(0)" @click.prevent="handleClickNav(index)" v-else>{{item.value}}</a>
                 </li>
-            </ul>
+            </ul>            
+            <marquee direction="up" behavior="scroll" scrollamount="3" scrolldelay="10" align="left" bgcolor="#ffffff" width="100%" hspace="0" vspace="0" class="ad-word" v-if="vedioInfo.AdWord && vedioInfo.AdWord.length>0">
+              {{vedioInfo.AdWord}}
+            </marquee>         
         </div>
         <div class="fix-input-bar" ref="fixInputBar" v-if="tabData.index==0">
             <ul class="op-box">
@@ -457,7 +460,7 @@ export default {
                 observeParents: true                      
             },     
             showPlayer: false,
-            swiperSlides: ['http://res.heyhou.com/image/2017/07/09/edfee97952303f86774131d1cecf73b1.jpg?imageView2/1/w/375/h/180', 'http://res.heyhou.com/image/2017/07/28/18a4309efed43ce8451994f3f667a241.jpg?imageView2/1/w/375/h/180'],
+            bannerList: [],
             video: {
                 width: 360,
                 height: 640
@@ -487,7 +490,7 @@ export default {
             videoId:this.getParam('videoId'),
             commentList:[],
             sendRedPacketData:{                
-                type:1,
+                type:2,
                 num:'',
                 money:'',
                 codeWord:''
@@ -755,7 +758,7 @@ export default {
                             }.bind(this)
                         });
                     } else {
-                        this.this.showLoading = false;
+                        this.showLoading = false;
                         this.showToast(res.msg);
                     }
                 }.bind(this),
@@ -1332,6 +1335,7 @@ export default {
                     if (res.ret == 0) {
                         this.vedioInfo = res.data.vedioInfo;
                         this.cooperation = res.data.cooperation;
+                        this.bannerList = res.data.vedioInfo.bannerJson;
                         document.title = res.data.vedioInfo.name;
                         weixinUtils.wxInit(res.data.jsSign);
 
