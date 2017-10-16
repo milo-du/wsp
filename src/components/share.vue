@@ -28,7 +28,7 @@ export default {
     },
     created() {
         document.title = '邀请';
-        this.loadData();        
+        //this.loadData();        
         window.fMain=function(src){  
            this.qrImg = src;          
         }  
