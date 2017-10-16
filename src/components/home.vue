@@ -739,9 +739,9 @@ export default {
                         this.weixinPay({
                             info: res.data,
                             success: function() {
-                                this.checkPayStatus(redpacketId).then(function(res) {                                    
+                                this.checkPayStatus(redpacketId).then(function(res) {
                                     if (res.ret == 0) {
-                                        if (res.data.isPayed == 1) {                                         
+                                        if (res.data.isPayed == 1) {                
                                             this.loadComment('new');
                                             this.closeAllPop();                   
                                         } else {
@@ -753,6 +753,7 @@ export default {
                                 }.bind(this));
                             }.bind(this),
                             error: function(err) {
+                                alert(err);
                                 this.showLoading = false;
                                 this.showToast(JSON.stringify(err));
                             }.bind(this)
