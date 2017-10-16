@@ -31,16 +31,16 @@
                     <a href="javascript:void(0)" @click.prevent="handleClickNav(index)" class="on" v-if="item.key==tabData.index">{{item.value}}</a>
                     <a href="javascript:void(0)" @click.prevent="handleClickNav(index)" v-else>{{item.value}}</a>
                 </li>
-            </ul>            
-            <marquee direction="up" behavior="scroll" scrollamount="3" scrolldelay="10" align="left" bgcolor="#ffffff" width="100%" hspace="0" vspace="0" class="ad-word" v-if="vedioInfo.AdWord && vedioInfo.AdWord.length>0">
-              {{vedioInfo.AdWord}}
-            </marquee>         
+            </ul>                    
+            <div class="live-qiye-notice marqueediv" v-if="vedioInfo.AdWord && vedioInfo.AdWord.length>0">
+                <marquee scrollamount="3">{{vedioInfo.AdWord}}</marquee>
+            </div>                  
         </div>
         <div class="fix-input-bar" ref="fixInputBar" v-if="tabData.index==0">
             <ul class="op-box">
                 <li class="inputicon qqface" @click.prevent="handleShowQQFaceBox()"></li>
                 <li class="li-input thinborder">
-                    <input class="speakInput flex" ref="chatInput" type="text" v-model="cmtInput" @keydown="handleChooseIcon('[删除]',$event)" placeholder="来说点什么吧..." @click="handleInputClick"></li>
+                    <input class="speakInput flex" ref="chatInput" type="text" v-model="cmtInput" @keydown="handleChooseIcon('[删除]',$event)" placeholder="来说点什么吧..." @focus="handleInputFocus"></li>
                 <li class="inputicon iconmore" @click.prevent="handleShowMoreBox()" v-if="!showSendBtn"></li>
                 <li class="btnLiveTalk" @click.prevent="sendCmt" v-if="showSendBtn">发送</li>
             </ul>
@@ -243,7 +243,7 @@
                 <ul>
                     <li class="d-flex line vcenter">
                         <span>红包个数</span>
-                        <input type="tel" v-model="sendRedPacketData.num" placeholder="填写红包个数,最多500个" max="500" class="flex inputbox" id="bagAmount" min="0">
+                        <input type="tel" v-model="sendRedPacketData.num" placeholder="填写红包个数,最多500个" max="500" class="flex inputbox" id="bagAmount" min="0" @focus="handleInputRedPackNumFocus" ref="redPacketDataNum">
                         <span>个</span>
                     </li>
                     <li class="d-flex line vcenter">
@@ -255,7 +255,7 @@
                             总金额
                             <i v-if="sendRedPacketData.type!=1"><img src="/static/img/redpacketping.png"></i>
                         </span>
-                        <input type="number" v-model="sendRedPacketData.money" placeholder="填写金额" class="flex inputbox" id="bagMoney" min="0">
+                        <input type="number" v-model="sendRedPacketData.money" placeholder="填写金额" class="flex inputbox" id="bagMoney" min="0" @focus="handleInputRedPackMoneyFocus" ref="redPacketDataMoney">
                         <span>元</span>
                     </li>
                     <li class="d-flex">
@@ -613,11 +613,30 @@ export default {
         reload:function(){
             window.location.reload();
         },
-        handleInputClick:function(){            
+        handleInputFocus:function(){            
            setTimeout(function(){
-             this.$refs.chatInput.scrollIntoViewIfNeeded();             
-           }.bind(this),400);
+             let chatInput = this.$refs.chatInput;
+             chatInput.scrollIntoView(true);
+             chatInput.scrollIntoViewIfNeeded(); 
+              window.scrollTo(0,document.body.offsetHeight);            
+           }.bind(this),200);
         },
+        handleInputRedPackNumFocus:function(){            
+           setTimeout(function(){
+             let chatInput = this.$refs.redPacketDataNum;
+             chatInput.scrollIntoView(true);
+             chatInput.scrollIntoViewIfNeeded(); 
+              window.scrollTo(0,document.body.offsetHeight);            
+           }.bind(this),200);
+        },   
+        handleInputRedPackMoneyFocus:function(){            
+           setTimeout(function(){
+             let chatInput = this.$refs.redPacketDataMoney;
+             chatInput.scrollIntoView(true);
+             chatInput.scrollIntoViewIfNeeded(); 
+              window.scrollTo(0,document.body.offsetHeight);            
+           }.bind(this),200);
+        },             
         handleShowReciveRedpacketList:function(redPacketId){
             var redPacketId = redPacketId || this.redPackInfo.id;            
             this.showOpenRedPackBox = false;            
@@ -1461,6 +1480,6 @@ export default {
 }
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="less">
+<style lang="less">
 @import '../../static/less/home.less';
 </style>

@@ -1,20 +1,6 @@
-<template>
-    <div class="container">
-       <dl class="topic_share_card_text">
-            <dt>如何玩转邀请卡</dt>
-            <dd>1.公开话题/加密话题邀请好友来看直播,榜上有名;</dd>
-            <dd>2.长按保存图片或点击右上角"..."发送给好友即可邀请;</dd>           
-        </dl>
-        <img class="qrcode-img" :src="qrImg" id="InviteCardImage">
-        <div class="toast-box" v-if="toastTxt.length>0">
-            <div class="pop-mask"></div>
-            <span class="toast-text">{{toastTxt}}</span>
-        </div>      
-        <iframe id="childframe" name="childframe" ref="childframe" src="http://wsp.mzlicai.cn/video/inviteHtml" style="display:none;"></iframe> 
-    </div>    
+<template>      
 </template>
 <script>
-import weixinUtils from "../weixinUtils.js";
 export default {
     name: 'share',
     components: {
@@ -28,31 +14,12 @@ export default {
     },
     created() {
         document.title = '邀请';
-        this.loadData();        
-        window.fMain=function(src){  
-           this.qrImg = src;          
-        }  
+        parent.parent.fMain(this.getParam('src'));
     },
     watch:{
 
     },
     methods: {
-        initMsg:function(){
-            this.$nextTick(function() {
-                var ifra = this.$refs.childframe;
-                ifra.contentWindow.postMessage('getImg', "http://wx.heyhou.com");
-
-                function receiveMessage(event) {
-                    // 我们能相信信息的发送者吗?  (也许这个发送者和我们最初打开的不是同一个页面).
-                    if (event.origin !== "http://wx.heyhou.com")
-                        return;
-
-                    // event.source 是我们通过window.open打开的弹出页面 popup
-                    // event.data 是 popup发送给当前页面的消息 "hi there yourself!  the secret response is: rheeeeet!"
-                }
-                window.addEventListener("message", receiveMessage, false);
-            }.bind(this));
-        },
         showToast: function(txt) {
             this.toastTxt = txt;
             if (this.toastTid != null) {
@@ -244,7 +211,3 @@ export default {
     }
 }
 </script>
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="less">
-@import '../../static/less/share.less';
-</style>

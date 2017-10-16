@@ -391,6 +391,7 @@ ul, li {
 
 .tab-box {
 	width: 100%;
+	position: relative;
 
 	.nav {
 		background-color: #fff;
@@ -437,12 +438,19 @@ ul, li {
 
 	}
 
-	.ad-word {
+	.live-qiye-notice {
+		background: rgba(0, 0, 0, .6);
+		z-index: 3;
+		color: #fff;
 		height: 0.25rem;
-		display: block;
-		font-size: 0.12rem;		
-		text-align: center;
-		border-bottom: 0.005rem solid #e0e0e0;
+		line-height: 0.25rem;
+		position: absolute;
+		top: 0.4rem;
+		left: 0;
+		width: 100%;
+		font-size: 0.14rem;
+		overflow: hidden;
+		white-space: nowrap;
 	}
 
 }
