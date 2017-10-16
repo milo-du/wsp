@@ -724,8 +724,7 @@ export default {
           this.showWithdrawalsMoneyBox = false;
           this.showLoading = false;
         },
-        handleWeixinPay: function(redpacketId) {
-            this.showLoading = true;
+        handleWeixinPay: function(redpacketId) {            
             this.request({
                 type: 'post',
                 url: 'pay/wxHtml',
@@ -739,22 +738,21 @@ export default {
                         this.weixinPay({
                             info: res.data,
                             success: function() {
+                                this.showLoading = true;
                                 this.checkPayStatus(redpacketId).then(function(res) {
                                     if (res.ret == 0) {
                                         if (res.data.isPayed == 1) {                
-                                            this.loadComment('new');
-                                            this.closeAllPop();                   
+                                            this.loadComment('new');                              
                                         } else {
                                             this.showToast('支付失败');
                                         }
                                     } else {
                                         this.showToast(res.msg);
-                                    }                                    
+                                    }
+                                    this.closeAllPop();                               
                                 }.bind(this));
                             }.bind(this),
-                            error: function(err) {
-                                alert(err);
-                                this.showLoading = false;
+                            error: function(err) {                                
                                 this.showToast(JSON.stringify(err));
                             }.bind(this)
                         });
