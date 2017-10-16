@@ -14,7 +14,7 @@ export default {
     },
     created() {
         document.title = '邀请';
-        parent.parent.fMain(this.getParam('src'));
+        parent.parent.fMain(decodeURIComponent(this.getParam('src')));
     },
     watch:{
 
