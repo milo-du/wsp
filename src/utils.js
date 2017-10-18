@@ -14,6 +14,12 @@ exports.removeClass = function(elements, cName) {
 exports.mobileUA = function() {
 	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
+Array.prototype.contains = function(needle) {
+	for (i in this) {
+		if (this[i] == needle) return true;
+	}
+	return false;
+}
 
 function refreshRem() {
 	var win = window,

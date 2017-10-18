@@ -27,10 +27,12 @@
         </div>
         <div class="tab-box" ref="tabBox">
             <ul class="nav">
-                <li v-for="(item,index) in tabData.list">
-                    <a href="javascript:void(0)" @click.prevent="handleClickNav(index)" class="on" v-if="item.key==tabData.index">{{item.value}}</a>
-                    <a href="javascript:void(0)" @click.prevent="handleClickNav(index)" v-else>{{item.value}}</a>
-                </li>
+                <template v-for="(item,index) in tabData.list">
+                 <li v-bind:class="{ lastChild: item.value=='关注' }">
+                    <a href="javascript:void(0)" @click.prevent="handleClickNav(index,item.value)" class="on" v-if="item.key==tabData.index">{{item.value}}</a>
+                    <a href="javascript:void(0)" @click.prevent="handleClickNav(index,item.value)" v-else>{{item.value}}</a>
+                 </li>                    
+                </template>
             </ul>                    
             <div class="live-qiye-notice marqueediv" v-if="vedioInfo.AdWord && vedioInfo.AdWord.length>0">
                 <marquee scrollamount="3">{{vedioInfo.AdWord}}</marquee>
@@ -83,7 +85,7 @@
         </div>
         <div class="slide-content">
             <swiper :options="contentSwiperOption" ref="contentSwiper" v-bind:class="{ notransform: tabData.index==0 }">
-                <swiper-slide class="tab1" ref="tab1" v-bind:style="{ height: scrollBoxHeight + 'px' }" v-scroll="onScroll">                    
+                <swiper-slide class="tab1" ref="tab1" v-bind:style="{ height: scrollBoxHeight + 'px' }" v-scroll="onScroll" v-if="menuJson.contains('互动')">                    
                         <ul class="chat-msg-list"  @click.prevent="handleClickChatBox()">
                                 <li class="d-flex" v-if="loadingChat">
                                     <img src="/static/img/loading-chat.gif" class="loading-gif">
@@ -153,12 +155,12 @@
                             </template>
                         </ul>                    
                 </swiper-slide>
-                <swiper-slide class="tab2" v-bind:style="{ height: scrollBoxHeight2 + 'px' }">
+                <swiper-slide class="tab2" v-bind:style="{ height: scrollBoxHeight2 + 'px' }" v-if="menuJson.contains('介绍')">
                     <h2>直播介绍</h2>
                     <div class="detail-intro cooperation-html" v-html="vedioInfo.introduce">
                     </div>
                 </swiper-slide>
-                <swiper-slide class="tab3" v-bind:style="{ height: scrollBoxHeight2 + 'px' }">
+                <swiper-slide class="tab3" v-bind:style="{ height: scrollBoxHeight2 + 'px' }" v-if="menuJson.contains('榜单')">
                     <ul class="tab3-title">
                         <li>
                             <a href="javascript:void(0)" @click.prevent="handleSwitchNav(0)" v-bind:class="{ on: isActive==0 }">邀请榜</a>
@@ -216,7 +218,7 @@
                         </swiper-slide>
                     </swiper>
                 </swiper-slide>
-                <swiper-slide class="tab4" v-bind:style="{ height: scrollBoxHeight2 + 'px' }">
+                <swiper-slide class="tab4" v-bind:style="{ height: scrollBoxHeight2 + 'px' }" v-if="menuJson.contains('合作')">
                     <div v-html="cooperation" class="cooperation-html"></div>
                 </swiper-slide>
             </swiper>
@@ -465,24 +467,7 @@ export default {
                 width: 360,
                 height: 640
             },
-            tabData: {
-                list: [{
-                    key: 0,
-                    value: '互动'
-                }, {
-                    key: 1,
-                    value: '介绍'
-                }, {
-                    key: 2,
-                    value: '榜单'
-                },{
-                    key: 3,
-                    value: '合作'
-                }, {
-                    key: 4,
-                    value: '关注'
-                }],
-                index:0
+            tabData: {                
             },
             showFollowBox:false,
             isActive:0,
@@ -513,7 +498,8 @@ export default {
             withdrawalsMaxMoney:0,
             withdrawalsMinMoney:0,
             chatImgList:[],
-            preScrollHeight:0
+            preScrollHeight:0,
+            menuJson:[]
         }
     },
     created() {
@@ -1206,8 +1192,8 @@ export default {
         handleCloseFollowBox:function(){
           this.showFollowBox = false;
         },   
-        handleClickNav:function(index){ 
-           if(index < 4 ){             
+        handleClickNav:function(index,text){ 
+           if(text != '关注' ){             
              this.$refs.contentSwiper.swiper.slideTo(index);
              this.tabData.index = index;
            }else{
@@ -1351,7 +1337,7 @@ export default {
             }).then(function(res) {
                     res = res.data;
                     if (res.ret == 0) {
-                        this.vedioInfo = res.data.vedioInfo;
+                        this.vedioInfo = res.data.vedioInfo;                        
                         this.cooperation = res.data.cooperation;
                         this.bannerList = res.data.vedioInfo.bannerJson;
                         document.title = res.data.vedioInfo.name;
@@ -1362,7 +1348,20 @@ export default {
                           desc: this.vedioInfo.shareContent,
                           link: this.vedioInfo.shareLink,
                           imgUrl: this.vedioInfo.shareIcon
-                        });                          
+                        });                       
+                        var menuJson = this.menuJson = this.vedioInfo.menuJson,
+                         list = [];
+                        for(var i=0;i<menuJson.length;i++)
+                        {
+                           list.push({
+                            key:i,
+                            value:menuJson[i]
+                           })
+                        }
+                        this.tabData ={
+                            list:list,
+                            index:0
+                        }   
                     }
                     else{
                         this.showToast(res.msg);
