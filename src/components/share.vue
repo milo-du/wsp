@@ -27,32 +27,15 @@ export default {
         }
     },
     created() {
-        document.title = '邀请';
-        //this.loadData();        
-        window.fMain=function(src){  
+        document.title = '邀请';             
+        window.fMain = function(src){  
            this.qrImg = src;          
-        }  
+        }.bind(this);
     },
     watch:{
 
     },
-    methods: {
-        initMsg:function(){
-            this.$nextTick(function() {
-                var ifra = this.$refs.childframe;
-                ifra.contentWindow.postMessage('getImg', "http://wx.heyhou.com");
-
-                function receiveMessage(event) {
-                    // 我们能相信信息的发送者吗?  (也许这个发送者和我们最初打开的不是同一个页面).
-                    if (event.origin !== "http://wx.heyhou.com")
-                        return;
-
-                    // event.source 是我们通过window.open打开的弹出页面 popup
-                    // event.data 是 popup发送给当前页面的消息 "hi there yourself!  the secret response is: rheeeeet!"
-                }
-                window.addEventListener("message", receiveMessage, false);
-            }.bind(this));
-        },
+    methods: {       
         showToast: function(txt) {
             this.toastTxt = txt;
             if (this.toastTid != null) {
