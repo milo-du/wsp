@@ -11,7 +11,7 @@
             <div class="pop-mask"></div>
             <span class="toast-text">{{toastTxt}}</span>
         </div>      
-        <iframe id="childframe" name="childframe" ref="childframe" src="http://wsp.mzlicai.cn/video/inviteHtml" style="display:none;"></iframe> 
+        <iframe id="childframe" name="childframe" ref="childframe" :src="frameUrl" style="display:none;"></iframe> 
     </div>    
 </template>
 <script>
@@ -24,12 +24,16 @@ export default {
     data() {
         return {
             toastTxt:'',
-            qrImg:''
+            qrImg:'',
+            videoId:0,
+            frameUrl:''
         }
     },
     created() {
-        document.title = '邀请';             
-        window.fMain = function(src){  
+        document.title = '邀请';
+        this.loadData();        
+        this.frameUrl = `http://wsp.mzlicai.cn/video/inviteHtml?userId=${this.getParam('fromUserId')}&videoId=${this.getParam('id')}"`;
+        window.fMain = function(src){
            this.qrImg = src;          
         }.bind(this);
     },
@@ -52,7 +56,7 @@ export default {
         },
         loadData:function(){
             this.request({                
-                url: 'video/inviteInfo',                
+                url: 'video/inviteInfo',           
                 data: {
                     videoId: this.getParam('id'),
                     fromUserId:this.getParam('fromUserId')
@@ -61,9 +65,7 @@ export default {
                     res = res.data;
                     if (res.ret == 0) {
                         var userInfo = this.getUserInfo();
-                        var videoInfo = res.data.videoInfo;                        
-                        this.qrImg = `${CONFIG.DOMAIN.API}/tool/qrCode?uid=${userInfo.uid}&token=${userInfo.token}&data=${res.data.qrCodeUrl}`;
-                          
+                        var videoInfo = res.data.videoInfo;
                         this.bindWeixinShare({
                           title: videoInfo.shareTitle,
                           desc: videoInfo.shareContent,
