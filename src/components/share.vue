@@ -5,7 +5,8 @@
             <dd>1.公开话题/加密话题邀请好友来看直播,榜上有名;</dd>
             <dd>2.长按保存图片或点击右上角"..."发送给好友即可邀请;</dd>           
         </dl>
-        <img class="qrcode-img" :src="qrImg" id="InviteCardImage">
+        <img class="qrcode-img" v-if="qrImg" :src="qrImg" id="InviteCardImage">
+        <img src="/static/img/loading.gif" v-else class="loading-img">
         <div class="toast-box" v-if="toastTxt.length>0">
             <div class="pop-mask"></div>
             <span class="toast-text">{{toastTxt}}</span>
@@ -23,7 +24,7 @@ export default {
     data() {
         return {
             toastTxt:'',
-            qrImg:'/static/img/loading.gif'
+            qrImg:''
         }
     },
     created() {
