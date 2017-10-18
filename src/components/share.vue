@@ -23,7 +23,7 @@ export default {
     data() {
         return {
             toastTxt:'',
-            qrImg:''
+            qrImg:'/static/img/loading.gif'
         }
     },
     created() {
