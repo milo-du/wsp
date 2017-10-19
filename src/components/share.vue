@@ -31,8 +31,8 @@ export default {
     },
     created() {
         document.title = '邀请';
-        this.loadData();        
-        this.frameUrl = `http://wsp.mzlicai.cn/video/inviteHtml?userId=${this.getParam('fromUserId')}&videoId=${this.getParam('id')}"`;
+        this.loadData();  
+        this.frameUrl = `http://wsp.mzlicai.cn/video/inviteHtml?userId=${this.getParam('fromUserId')}&videoId=${this.getParam('id')}`;
         window.fMain = function(src){
            this.qrImg = src;          
         }.bind(this);
