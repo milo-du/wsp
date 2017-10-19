@@ -228,12 +228,12 @@
             <div class="popup" @click.prevent="handleCloseFollowBox">
                 <div class="popup-head">
                     <h3 class="popup-title">
-                        长按关注 <strong class="balanced" style="font-weight:bold">微彩南昌 现场直播</strong>
+                        长按关注 <strong class="balanced" style="font-weight:bold;">{{platformName}}</strong>
                         公众号
                     </h3>
                 </div>
                 <div class="popup-body">
-                    <img src="https://gss0.bdstatic.com/94o3dSag_xI4khGkpoWK1HF6hhy/baike/w%3D268%3Bg%3D0/sign=7bcb659c9745d688a302b5a29cf91a23/2934349b033b5bb571dc8c5133d3d539b600bc12.jpg">
+                    <img src="/static/img/qrcode.jpg">
                     <p>关注后可收到直播最新动态哦</p>
                 </div>
             </div>
@@ -301,7 +301,7 @@
         <div class="reward-redpacket-box" v-if="showRewardRedpacketBox">
             <div class="pop-mask" @click.prevent="handleHideRewardRedpacket"></div>
             <div class="popup">
-                <img src="/static/img/defaultuser.jpg" class="user-photo">
+                <img src="/static/img/platformPhoto.png" class="user-photo">
                 <a href="javascript:void(0)" class="close-redpack-btn" @click.prevent="handleHideRewardRedpacket"></a>
                 <div class="content-info">
                     <p class="nickname">{{platformName}}</p>
@@ -450,16 +450,16 @@ export default {
                 mousewheelControl: true,
                 observeParents: true,
                 onSlideChangeEnd: function(swiper) {
-                    var activeIndex = swiper.activeIndex;                    
+                    var activeIndex = swiper.activeIndex;
                     this.isActive = activeIndex;
                 }.bind(this)
             },
             qqFaceSwiperOption:{
-                setWrapperSize: true,                
+                setWrapperSize: true,
                 paginationClickable: false,
                 pagination: '.swiper-pagination',
                 mousewheelControl: true,
-                observeParents: true                      
+                observeParents: true
             },     
             showPlayer: false,
             bannerList: [],
