@@ -3,8 +3,9 @@
         <swiper :options="swiperOption" v-if="bannerList && bannerList.length>0" ref="bannerSwiper">
             <swiper-slide v-for="slide in bannerList" class="swiper-img-slide">
                 <img :src="slide"></swiper-slide>
-            <div class="swiper-pagination" slot="pagination"></div>
+            <div class="swiper-pagination" slot="pagination"></div>            
         </swiper>
+        <a href="javascript:void(0)" class="banner-close-btn" @click.prevent="closeBanner()" v-if="bannerList && bannerList.length>0"><img src="/static/img/icon-close.png"></a>        
         <div class="video-box" ref="videoBox">
             <img :src="vedioInfo.img" class="video-cover" v-if="!showPlayer">
             <a href="javascript:void(0)" class=
@@ -28,7 +29,7 @@
         <div class="tab-box" ref="tabBox">
             <ul class="nav">
                 <template v-for="(item,index) in tabData.list">
-                 <li v-bind:class="{ lastChild: item.value=='关注' }">
+                 <li v-bind:class="{ lastChild: item.letter=='e' }">
                     <a href="javascript:void(0)" @click.prevent="handleClickNav(index,item.value)" class="on" v-if="item.key==tabData.index">{{item.value}}</a>
                     <a href="javascript:void(0)" @click.prevent="handleClickNav(index,item.value)" v-else>{{item.value}}</a>
                  </li>                    
@@ -85,7 +86,7 @@
         </div>
         <div class="slide-content">
             <swiper :options="contentSwiperOption" ref="contentSwiper" v-bind:class="{ notransform: tabData.index==0 }">
-                <swiper-slide class="tab1" ref="tab1" v-bind:style="{ height: scrollBoxHeight + 'px' }" v-scroll="onScroll" v-if="menuJson.contains('互动')">                    
+                <swiper-slide class="tab1" ref="tab1" v-bind:style="{ height: scrollBoxHeight + 'px' }" v-scroll="onScroll" v-if="menuJson.contains('a')">                    
                         <ul class="chat-msg-list"  @click.prevent="handleClickChatBox()">
                                 <li class="d-flex" v-if="loadingChat">
                                     <img src="/static/img/loading-chat.gif" class="loading-gif">
@@ -155,12 +156,12 @@
                             </template>
                         </ul>                    
                 </swiper-slide>
-                <swiper-slide class="tab2" v-bind:style="{ height: scrollBoxHeight2 + 'px' }" v-if="menuJson.contains('介绍')">
+                <swiper-slide class="tab2" v-bind:style="{ height: scrollBoxHeight2 + 'px' }" v-if="menuJson.contains('b')">
                     <h2>直播介绍</h2>
                     <div class="detail-intro cooperation-html" v-html="vedioInfo.introduce">
                     </div>
                 </swiper-slide>
-                <swiper-slide class="tab3" v-bind:style="{ height: scrollBoxHeight2 + 'px' }" v-if="menuJson.contains('榜单')">
+                <swiper-slide class="tab3" v-bind:style="{ height: scrollBoxHeight2 + 'px' }" v-if="menuJson.contains('c')">
                     <ul class="tab3-title">
                         <li>
                             <a href="javascript:void(0)" @click.prevent="handleSwitchNav(0)" v-bind:class="{ on: isActive==0 }">邀请榜</a>
@@ -218,7 +219,7 @@
                         </swiper-slide>
                     </swiper>
                 </swiper-slide>
-                <swiper-slide class="tab4" v-bind:style="{ height: scrollBoxHeight2 + 'px' }" v-if="menuJson.contains('合作')">
+                <swiper-slide class="tab4" v-bind:style="{ height: scrollBoxHeight2 + 'px' }" v-if="menuJson.contains('d')">
                     <div v-html="cooperation" class="cooperation-html"></div>
                 </swiper-slide>
             </swiper>
@@ -467,7 +468,9 @@ export default {
                 width: 360,
                 height: 640
             },
-            tabData: {                
+            tabData: {            
+                list:[],
+                index:0
             },
             showFollowBox:false,
             isActive:0,
@@ -555,6 +558,9 @@ export default {
         }
     },
     methods: {
+        closeBanner:function(){
+            this.bannerList = [];            
+        },
         initUserInfo:function(){
           var userInfo = {
              uid:this.getParam('uid'),
@@ -1349,15 +1355,21 @@ export default {
                           link: this.vedioInfo.shareLink,
                           imgUrl: this.vedioInfo.shareIcon
                         });                       
-                        var menuJson = this.menuJson = this.vedioInfo.menuJson,
-                         list = [];
-                        for(var i=0;i<menuJson.length;i++)
+                        var menuJson = this.vedioInfo.menuJson,
+                         list = [];       
+                        console.log(menuJson);
+                        var i = 0;       
+                        for(var j in menuJson)
                         {
+                          this.menuJson.push(j);                                             
                            list.push({
                             key:i,
-                            value:menuJson[i]
+                            value:menuJson[j],
+                            letter:j
                            })
+                           i++;
                         }
+                        console.log(list);
                         this.tabData ={
                             list:list,
                             index:0
