@@ -5,7 +5,7 @@
                 <img :src="slide"></swiper-slide>
             <div class="swiper-pagination" slot="pagination"></div>            
         </swiper>
-        <a href="javascript:void(0)" class="banner-close-btn" @click.prevent="closeBanner()" v-if="bannerList && bannerList.length>0"><img src="/static/img/icon-close.png"></a>        
+        <!-- <a href="javascript:void(0)" class="banner-close-btn" @click.prevent="closeBanner()" v-if="bannerList && bannerList.length>0"><img src="/static/img/icon-close.png"></a>         -->
         <div class="video-box" ref="videoBox">
             <img :src="vedioInfo.img" class="video-cover" v-if="!showPlayer">
             <a href="javascript:void(0)" class=

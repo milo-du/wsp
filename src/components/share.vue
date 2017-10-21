@@ -31,10 +31,29 @@ export default {
     },
     created() {
         document.title = '邀请';
-        this.loadData();  
-        this.frameUrl = `http://wsp.mzlicai.cn/video/inviteHtml?userId=${this.getParam('fromUserId')}&videoId=${this.getParam('id')}`;
+        this.loadData();        
         window.fMain = function(src){
-           this.qrImg = src;          
+           this.qrImg = src;    
+            this.request({                
+                url: 'video/saveQiNiuUrl',       
+                type:'post',
+                data: {
+                    videoId: this.getParam('id'),
+                    userId:this.getParam('fromUserId'),
+                    qiNiuUrl:src
+                }
+            }).then(function(res) {
+                    res = res.data;
+                    if (res.ret == 0) {
+                                              
+                    }
+                    else{
+                        this.showToast(res.msg);
+                    }
+                }.bind(this),
+                function(err) {
+                    this.showToast('服务器错误');
+                }.bind(this))                   
         }.bind(this);
     },
     watch:{
@@ -66,6 +85,14 @@ export default {
                     if (res.ret == 0) {
                         var userInfo = this.getUserInfo();
                         var videoInfo = res.data.videoInfo;
+                        if(!res.data.qiNiuUrl)
+                        {                            
+                           this.frameUrl = `http://wsp.mzlicai.cn/video/inviteHtml?userId=${this.getParam('fromUserId')}&videoId=${this.getParam('id')}`;
+                        }
+                        else{
+
+                            this.qrImg = res.data.qiNiuUrl;
+                        }
                         this.bindWeixinShare({
                           title: videoInfo.shareTitle,
                           desc: videoInfo.shareContent,
