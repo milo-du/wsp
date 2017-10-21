@@ -1356,8 +1356,7 @@ export default {
                           imgUrl: this.vedioInfo.shareIcon
                         });                       
                         var menuJson = this.vedioInfo.menuJson,
-                         list = [];       
-                        console.log(menuJson);
+                         list = [];                               
                         var i = 0;       
                         for(var j in menuJson)
                         {
@@ -1368,8 +1367,7 @@ export default {
                             letter:j
                            })
                            i++;
-                        }
-                        console.log(list);
+                        }                        
                         this.tabData ={
                             list:list,
                             index:0
