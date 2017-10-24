@@ -278,7 +278,11 @@
                         {{reciveRedpacketData.redPackInfo && reciveRedpacketData.redPackInfo.nickName}}的红包
                         <em v-if="reciveRedpacketData.redPackInfo && reciveRedpacketData.redPackInfo.type=='2'">拼</em>
                     </p>
-                    <p class="money">{{reciveRedpacketData.redPackInfo && (Number(reciveRedpacketData.redPackInfo.money)/100)}}元</p>
+                    <p class="money">
+                       <template v-if="reciveRedpacketData.userReceiveMoney">
+                         {{(Number(reciveRedpacketData.userReceiveMoney)/100)}}元       
+                       </template>
+                    </p>
                     <div class="readpacket-title">{{reciveRedpacketData.displayWord}}</div>
                     <ul class="user-list">
                         <li class="flex user-item" v-for="item in reciveRedpacketData.redPacketLogList">
