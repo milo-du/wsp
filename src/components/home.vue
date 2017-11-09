@@ -7,11 +7,9 @@
         </swiper>
         <!-- <a href="javascript:void(0)" class="banner-close-btn" @click.prevent="closeBanner()" v-if="bannerList && bannerList.length>0"><img src="/static/img/icon-close.png"></a>         -->
         <div class="video-box" ref="videoBox">
-            <img :src="vedioInfo.img" class="video-cover" v-if="!showPlayer">
-            <a href="javascript:void(0)" class=
-
-            "btn-play" v-if="!showPlayer" @click.prevent="handleShowPlayer">
-                <img src="/static/img/play.png"></a>
+            <!-- <img :src="vedioInfo.img" class="video-cover" v-if="!showPlayer">
+            <a href="javascript:void(0)" class="btn-play" v-if="!showPlayer" @click.prevent="handleShowPlayer">
+                <img src="/static/img/play.png"></a> -->
             <a href="javascript:void(0)" class="videoicon btn-refresh" @click.prevent="reload()"></a>
             <span class="onlineuser">
                 <span class="videoicon seeuser"></span>
@@ -24,7 +22,7 @@
                 </div>
                 <span class="number zan-num" id="userpraise">{{vedioInfo.praiseNum || 0}}</span>                
             </div>
-            <video ref="player" v-if="showPlayer" controls="controls" @click.prevent="play" v-on:playing="onPlaying" v-on:pause="onPause" v-on:waiting="onWaiting" v-on:timeupdate="onTimeupdate" :poster="vedioInfo.img" :src="vedioInfo.vodUrl" class="show-audio" loop="true" width="100%" preload="auto" type="application/x-mpegURL" playsinline="true" webkit-playsinline="true" x-webkit-airplay="true" x5-video-player-type="h5" x5-video-player-fullscreen="true"></video>
+            <video ref="player" controls="controls" @click.prevent="play" v-on:playing="onPlaying" v-on:pause="onPause" v-on:waiting="onWaiting" v-on:timeupdate="onTimeupdate" :poster="vedioInfo.img" :src="vedioInfo.vodUrl" class="show-audio" loop="true" width="100%" preload="auto" type="application/x-mpegURL" playsinline="true" webkit-playsinline="true" x-webkit-airplay="true" x5-video-player-type="h5" x5-video-player-fullscreen="true"></video>
         </div>
         <div class="tab-box" ref="tabBox">
             <ul class="nav">
@@ -94,7 +92,10 @@
                             <template v-for="item in commentList">
                                 <li class="d-flex" v-if="item.type==2">
                                     <div class="marry-chat-content clearfix d-flex">
-                                        <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
+                                        <div class="userphoto-wrapper">
+                                          <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
+                                          <div class="abs-img" v-finger:longtap="onLongTap.bind(this,item.userNickName)"></div>                                        
+                                        </div>
                                         <div class="flex">
                                             <span class="nickname">{{item.userNickName}}</span>
                                             <div class="msg-content">
@@ -104,7 +105,10 @@
                                 </li>
                                 <li class="d-flex" v-if="item.type==1">
                                     <div class="marry-chat-content clearfix d-flex">
-                                        <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
+                                        <div class="userphoto-wrapper">
+                                          <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
+                                          <div class="abs-img" v-finger:longtap="onLongTap.bind(this,item.userNickName)"></div>                                        
+                                        </div>
                                         <div class="flex">
                                             <span class="nickname">{{item.userNickName}}</span>
                                             <div class="msg-content" v-html="replaceContent(item.content)"></div>
@@ -113,7 +117,10 @@
                                 </li>
                                 <li class="d-flex" v-if="item.type==3">
                                     <div class="marry-chat-content clearfix d-flex">
-                                        <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
+                                        <div class="userphoto-wrapper">
+                                          <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
+                                          <div class="abs-img" v-finger:longtap="onLongTap.bind(this,item.userNickName)"></div>                                        
+                                        </div>
                                         <div class="flex">
                                             <span class="nickname">{{item.userNickName}}</span>
                                             <div class="content-redpacket" @click.prevent="handleOpenRedpack(item.redPacketId)">
@@ -121,7 +128,7 @@
                                                     <li class="rpna-pic">
                                                         <img src="/static/img/hongbao_ico.png"></li>
                                                     <li class="flex">
-                                                        <p class="rena-wish">恭喜发财,大吉大利！</p>
+                                                        <p class="rena-wish">{{item.content}}</p>
                                                         <p class="rena-get">
                                                             <span>领取红包</span>
                                                         </p>
@@ -229,12 +236,12 @@
             <div class="popup" @click.prevent="handleCloseFollowBox">
                 <div class="popup-head">
                     <h3 class="popup-title">
-                        长按关注 <strong class="balanced" style="font-weight:bold;">{{platformName}}</strong>
+                        长按关注 <strong class="balanced" style="font-weight:bold;">{{vedioInfo && vedioInfo.wechatSubscriptionName}}</strong>
                         公众号
                     </h3>
                 </div>
                 <div class="popup-body">
-                    <img src="/static/img/qrcode.jpg">
+                    <img :src="(vedioInfo && vedioInfo.followQRCodeUrl) || followQRCodeUrl">
                     <p>关注后可收到直播最新动态哦</p>
                 </div>
             </div>
@@ -261,6 +268,12 @@
                         <input type="number" v-model="sendRedPacketData.money" placeholder="填写金额" class="flex inputbox" id="bagMoney" min="0" @focus="handleInputRedPackMoneyFocus" ref="redPacketDataMoney">
                         <span>元</span>
                     </li>
+                    <li class="d-flex line vcenter">
+                        <span class="totalmoney">
+                          红包说明                            
+                        </span>
+                        <input type="text" v-model="sendRedPacketData.codeWord" placeholder="恭喜发财，大吉大利" class="flex inputbox" @focus="handleInputRedPackCodeWordFocus" ref="redPacketCodeWord">                        
+                    </li>                    
                     <li class="d-flex">
                         <a href="javascript:void(0);" class="btn-cancel flex" @click.prevent="handleHideSendRedPacketBox">取消</a>
                         <div style="width:20px;"></div>
@@ -278,6 +291,9 @@
                         {{reciveRedpacketData.redPackInfo && reciveRedpacketData.redPackInfo.nickName}}的红包
                         <em v-if="reciveRedpacketData.redPackInfo && reciveRedpacketData.redPackInfo.type=='2'">拼</em>
                     </p>
+                    <p class="nickname">
+                        {{reciveRedpacketData.redPackInfo && reciveRedpacketData.redPackInfo.codeWord}}
+                    </p>                    
                     <p class="money">
                        <template v-if="reciveRedpacketData.userReceiveMoney">
                          {{(Number(reciveRedpacketData.userReceiveMoney)/100)}}元       
@@ -380,7 +396,7 @@
                 <p class="p-title">{{redPackInfo.nickName}}</p>
                 <template v-if="isSendEnd==0">
                     <p class="p-title2">发了一个红包，金额随机</p>
-                    <p class="p-title3">恭喜发财，大吉大利！</p>
+                    <p class="p-title3">{{redPackInfo.codeWord}}</p>
                 </template>
                 <template v-else>
                     <p class="p-title3">手慢了，红包派完了</p>
@@ -506,7 +522,8 @@ export default {
             withdrawalsMinMoney:0,
             chatImgList:[],
             preScrollHeight:0,
-            menuJson:[]
+            menuJson:[],
+            followQRCodeUrl:'/static/img/qrcode.jpg'
         }
     },
     created() {
@@ -562,6 +579,9 @@ export default {
         }
     },
     methods: {
+        onLongTap:function(nickName){            
+           this.cmtInput+=`@${nickName}`;
+        },
         closeBanner:function(){
             this.bannerList = [];            
         },
@@ -632,7 +652,15 @@ export default {
              chatInput.scrollIntoViewIfNeeded(); 
               window.scrollTo(0,document.body.offsetHeight);            
            }.bind(this),200);
-        },             
+        },     
+        handleInputRedPackCodeWordFocus:function(){            
+           setTimeout(function(){
+             let chatInput = this.$refs.redPacketCodeWord;
+             chatInput.scrollIntoView(true);
+             chatInput.scrollIntoViewIfNeeded(); 
+              window.scrollTo(0,document.body.offsetHeight);            
+           }.bind(this),200);
+        },                 
         handleShowReciveRedpacketList:function(redPacketId){
             var redPacketId = redPacketId || this.redPackInfo.id;            
             this.showOpenRedPackBox = false;            
@@ -804,6 +832,7 @@ export default {
         handleSendRedPacket:function(){
             this.sendRedPacketData.videoId=this.videoId;
             this.sendRedPacketData.money = this.sendRedPacketData.money * 100;
+            this.sendRedPacketData.codeWord = this.sendRedPacketData.codeWord || '恭喜发财,大吉大利';
             this.request({
                 type: 'post',
                 url: 'redPacket/sendRedPacket',
@@ -1347,7 +1376,7 @@ export default {
             }).then(function(res) {
                     res = res.data;
                     if (res.ret == 0) {
-                        this.vedioInfo = res.data.vedioInfo;                        
+                        this.vedioInfo = res.data.vedioInfo;
                         this.cooperation = res.data.cooperation;
                         this.bannerList = res.data.vedioInfo.bannerJson;
                         document.title = res.data.vedioInfo.name;

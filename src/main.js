@@ -12,6 +12,7 @@ import plupload from 'plupload';
 import dateFormat from "dateformat";
 import utils from "./utils.js";
 import CONFIG from "./config.js";
+import VueFinger from 'vue-finger';
 
 utils.refreshRem();
 window.moxie = plupload.moxie;
@@ -20,6 +21,7 @@ Vue.use(qiniuJS);
 Vue.use(vuescroll);
 Vue.use(vueResource);
 Vue.use(Toast);
+Vue.use(VueFinger);
 Vue.use(VueAwesomeSwiper);
 Vue.filter('dateFormat', dateFormat);
 Vue.config.productionTip = false;

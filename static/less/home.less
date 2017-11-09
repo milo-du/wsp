@@ -574,13 +574,36 @@ ul, li {
 						display: block;
 					}
 
-					img.userphoto {
-						display: inline-block;
+					.userphoto-wrapper {
 						width: 0.36rem;
 						height: 0.36rem;
-						border-radius: 0.05rem;
-						vertical-align: middle;
+						position: relative;
 						margin-right: 0.12rem;
+
+						img.userphoto {
+							display: inline-block;
+							width: 0.36rem;
+							height: 0.36rem;
+							border-radius: 0.05rem;
+							vertical-align: middle;
+						}
+
+						.abs-img {
+							width: 0.36rem;
+							height: 0.36rem;
+							display: block;
+							position: absolute;
+							left: 0;
+							top: 0;
+							-webkit-touch-callout: none;
+							-webkit-user-select: none;
+							-khtml-user-select: none;
+							-moz-user-select: none;
+							-ms-user-select: none;
+							user-select: none;
+							z-index: 999;
+						}
+
 					}
 
 					.nickname {
