@@ -497,6 +497,7 @@ export default {
             qqIconData:qqfaceJson.data,
             videoId:this.getParam('videoId'),
             commentList:[],
+            preCommentList:[],
             sendRedPacketData:{                
                 type:2,
                 num:'',
@@ -536,7 +537,13 @@ export default {
         }.bind(this), false);
         setInterval(()=>{
             this.loadComment('new');
-        },3000);      
+        },3000);   
+        setInterval(()=>{
+            if(this.preCommentList && this.preCommentList.length == 0)
+            {
+               this.loadComment('preOld');
+            }               
+        },2000);        
     },
     watch:{
         'cmtInput': function(c, o) {
@@ -1450,6 +1457,7 @@ export default {
                     }
                     break;
                 case 'old':
+                case 'preOld':
                     {
                         formData.type = 'old';
                         formData.commentId = commentList[0].id;                        
@@ -1493,12 +1501,18 @@ export default {
                             case 'old':
                                 {
                                     this.commentList = res.data.concat(this.commentList);
-                                    this.loadingChat = false;                                    
+                                    this.loadingChat = false;       
+                                    this.preCommentList = [];                             
                                     this.$nextTick(function(){
                                        this.$refs.tab1.$el.scrollTop = this.$refs.tab1.$el.scrollHeight - this.preScrollHeight;
                                     });
                                 }
                                 break;
+                            case 'preOld':
+                                {
+                                    this.preCommentList = res.data;                    
+                                }
+                                break;                                
                         }                        
                     }
                     else{
@@ -1513,9 +1527,20 @@ export default {
             if(position.scrollTop == 0 ){                  
                 this.loadingChat = true;
                 this.preScrollHeight = this.$refs.tab1.$el.scrollHeight;
-                setTimeout(()=>{
-                   this.loadComment('old');
-                },500);                
+                if(this.preCommentList && this.preCommentList.length>0)
+                {                    
+                    this.commentList = this.preCommentList.concat(this.commentList);
+                    this.loadingChat = false;                                    
+                    this.$nextTick(function(){
+                        this.$refs.tab1.$el.scrollTop = this.$refs.tab1.$el.scrollHeight - this.preScrollHeight;
+                    });              
+                    this.preCommentList =[];      
+                }
+                else{
+                  setTimeout(()=>{
+                    this.loadComment('old');
+                  },500);                
+                }
             }
         }
     }
