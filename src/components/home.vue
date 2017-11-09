@@ -587,7 +587,7 @@ export default {
     },
     methods: {
         onLongTap:function(nickName){            
-           this.cmtInput+=`@${nickName}`;
+           this.cmtInput+=`@${nickName} `;
         },
         closeBanner:function(){
             this.bannerList = [];            
@@ -851,6 +851,7 @@ export default {
                       var redpacketId = res.data.redpacketId;
                       this.sendRedPacketData.money  = '';
                       this.sendRedPacketData.num  = '';
+                      this.sendRedPacketData.codeWord = '';
                       this.handleWeixinPay(redpacketId);
                     }
                     else{
