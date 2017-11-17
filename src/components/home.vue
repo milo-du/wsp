@@ -84,7 +84,14 @@
         </div>
         <div class="slide-content">
             <swiper :options="contentSwiperOption" ref="contentSwiper" v-bind:class="{ notransform: tabData.index==0 }">
-                <swiper-slide class="tab1" ref="tab1" v-bind:style="{ height: scrollBoxHeight + 'px' }" v-scroll="onScroll" v-if="menuJson.contains('a')">                    
+                <swiper-slide class="tab1" ref="tab1" v-bind:style="{ height: scrollBoxHeight + 'px' }" v-scroll="onScroll" v-if="menuJson.contains('a')">  
+                         <div class="upload-loading-box" v-if="uploadPercent>0">
+                           <div v-bind:class="{'circle': true, 'clip-auto':clipAuto}">  
+                           <div class="percent left" v-bind:style="{ transform: uploadPercentTransform }"></div>  
+                           <div v-bind:class="{'percent': true,'right': true, 'wth0':wth0}"></div>  
+                           </div>  
+                          <div class="num"><span>{{uploadPercent}}</span>%</div>             
+                        </div>                                        
                         <ul class="chat-msg-list"  @click.prevent="handleClickChatBox()">
                                 <li class="d-flex" v-if="loadingChat">
                                     <img src="/static/img/loading-chat.gif" class="loading-gif">
@@ -410,7 +417,7 @@
         <div class="toast-box" v-if="toastTxt.length>0">
             <div class="pop-mask"></div>
             <span class="toast-text">{{toastTxt}}</span>
-        </div>
+        </div>       
     </div>
 </template>
 <script>
@@ -426,6 +433,10 @@ export default {
     },
     data() {
         return {
+            uploadPercent:0,
+            clipAuto:false,
+            wth0:true,
+            uploadPercentTransform:"rotate(0deg)",
             platformName:'御道文化传媒',
             toastTid:null,
             toastTxt:'',
@@ -466,7 +477,7 @@ export default {
                 }.bind(this)
             },
             listSwiperOption: {
-                setWrapperSize: true,                
+                setWrapperSize: true,
                 paginationClickable: true,
                 mousewheelControl: true,
                 observeParents: true,
@@ -498,7 +509,7 @@ export default {
             videoId:this.getParam('videoId'),
             commentList:[],
             preCommentList:[],
-            sendRedPacketData:{                
+            sendRedPacketData:{
                 type:2,
                 num:'',
                 money:'',
@@ -543,9 +554,20 @@ export default {
             {
                this.loadComment('preOld');
             }               
-        },2000);        
+        },2000);
     },
     watch:{
+        'uploadPercent':function(percent,o){
+            if(percent>100){  
+                this.uploadPercent = 0;  
+                this.clipAuto = false;
+                this.wth0 = true;                
+            }else if(percent>50){
+                this.clipAuto = true;
+                this.wth0 = false;                                
+            } 
+            this.uploadPercentTransform = "rotate("+(18/5)*percent+"deg)";
+        },
         'cmtInput': function(c, o) {
             if (c.length != 0) {
                 this.showSendBtn = true;
@@ -593,7 +615,7 @@ export default {
            this.cmtInput+=`@${nickName} `;
         },
         closeBanner:function(){
-            this.bannerList = [];            
+            this.bannerList = [];
         },
         initUserInfo:function(){
           var userInfo = {
@@ -1025,10 +1047,12 @@ export default {
                     },
                     'UploadProgress': function(up, file) {
                         var btn = up.getOption('browse_button')[0];                        
-                    },
+                        this.uploadPercent = file.percent;                        
+                    }.bind(this),
                     'FileUploaded': function(up, file, info) {                        
                         var result = JSON.parse(info.response);                        
                         var imgUrl ='http://resource.mzlicai.cn/'+result.key;
+                        this.uploadPercent = 0; 
                         this.postCmt('',imgUrl);
                     }.bind(this),
                     'Error': function(up, err, errTip) {

@@ -33,6 +33,68 @@ ul, li {
 
 }
 
+.upload-loading-box, .circle, .percent {
+	position: absolute;
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+}
+
+.upload-loading-box {
+	position: fixed;
+	top: 3.5rem;
+	right: 0.15rem;
+	background-color: #ccc;
+	z-index: 999;
+
+	.circle {
+		box-sizing: border-box;
+		border: 5px solid #ccc;
+		clip: rect(0, 50px, 50px, 25px);
+	}
+
+	.clip-auto {
+		clip: rect(auto, auto, auto, auto);
+	}
+
+	.percent {
+		box-sizing: border-box;
+		top: -5px;
+		left: -5px;
+	}
+
+	.left {
+		transition: transform ease;
+		border: 5px solid #FFD217;
+		clip: rect(0, 25px, 50px, 0);
+	}
+
+	.right {
+		border: 5px solid #FFD217;
+		clip: rect(0, 50px, 50px, 25px);
+	}
+
+	.wth0 {
+		width: 0;
+	}
+
+	.num {
+		position: absolute;
+		box-sizing: border-box;
+		width: 40px;
+		height: 40px;
+		line-height: 40px;
+		text-align: center;
+		font-size: 8px;
+		left: 5px;
+		top: 5px;
+		border-radius: 50%;
+		background-color: #fff;
+		z-index: 1;
+	}
+
+}
+
 .video-box {
 	height: 2.1rem;
 	position: relative;
