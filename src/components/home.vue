@@ -94,7 +94,7 @@
                                     <div class="marry-chat-content clearfix d-flex">
                                         <div class="userphoto-wrapper">
                                           <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
-                                          <div class="abs-img" v-finger:longtap="onLongTap.bind(this,item.userNickName)"></div>                                        
+                                          <div class="abs-img" v-finger:longtap="onLongTap.bind(this,item.userNickName)" v-on:contextmenu="disabledContentMenu"></div>                                        
                                         </div>
                                         <div class="flex">
                                             <span class="nickname">{{item.userNickName}}</span>
@@ -107,7 +107,7 @@
                                     <div class="marry-chat-content clearfix d-flex">
                                         <div class="userphoto-wrapper">
                                           <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
-                                          <div class="abs-img" v-finger:longtap="onLongTap.bind(this,item.userNickName)"></div>                                        
+                                          <div class="abs-img" v-finger:longtap="onLongTap.bind(this,item.userNickName)" v-on:contextmenu="disabledContentMenu"></div>                                        
                                         </div>
                                         <div class="flex">
                                             <span class="nickname">{{item.userNickName}}</span>
@@ -119,7 +119,7 @@
                                     <div class="marry-chat-content clearfix d-flex">
                                         <div class="userphoto-wrapper">
                                           <img :src="item.userHeadImgUrl" class="userphoto" @error="imageLoadError">
-                                          <div class="abs-img" v-finger:longtap="onLongTap.bind(this,item.userNickName)"></div>                                        
+                                          <div class="abs-img" v-finger:longtap="onLongTap.bind(this,item.userNickName)" v-on:contextmenu="disabledContentMenu"></div>                                        
                                         </div>
                                         <div class="flex">
                                             <span class="nickname">{{item.userNickName}}</span>
@@ -586,6 +586,9 @@ export default {
         }
     },
     methods: {
+        disabledContentMenu:function(e){
+            e.preventDefault();
+        },
         onLongTap:function(nickName){            
            this.cmtInput+=`@${nickName} `;
         },
