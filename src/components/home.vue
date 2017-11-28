@@ -1460,6 +1460,30 @@ export default {
               }
            }
         },
+        filterDuplication:function(data){
+          var newData = [];
+          if(data && data.length>0)
+           {              
+              for(var i=0;i<data.length;i++)
+              {                
+                  if(!this.existsItem(data[i])){
+                     newData.push(data[i]);
+                  }
+              }
+           }
+           return newData;
+        },
+        existsItem:function(item){
+            var cmtList = this.commentList;
+            for(var i = 0; i < cmtList.length;i++)
+            {
+               if(item.id && cmtList[i].id == item.id)
+               {
+                  return true;
+               }
+            }
+            return false;
+        },
         loadComment(type) {       
             var formData = {
                 videoId: this.videoId
@@ -1500,6 +1524,7 @@ export default {
             }).then(function(res) {                    
                     res = res.data;                    
                     if (res.ret == 0) {
+                        res.data = this.filterDuplication(res.data);
                         this.filterImgList(res.data);
                         res.data = res.data.reverse();
                         switch (type) {
@@ -1548,7 +1573,7 @@ export default {
                     }
                 }.bind(this),
                 function(err) {
-                    this.showToast('服务器错误');                    
+                    this.showToast('服务器错误');              
                 }.bind(this))
         },
         onScroll:function(e, position){                   
